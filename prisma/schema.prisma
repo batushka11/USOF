@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  login        String    @unique
+  password     String
+  fullname     String
+  email        String    @unique
+  avatarPath   String    @default("default_avatar.png") @map("avatar_path")
+  role         Role      @default(USER)
+  post         Post[]
+  comment      Comment[]
+  like         Like[]
+  rating       Int       @default(0)
+  isConfirm    Boolean   @default(false) @map("is_confirm")
+  confirmToken String?   @unique @map("confirm_token")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+model Post {
+  id         Int            @id @default(autoincrement())
+  publishAt  DateTime       @default(now()) @map("publish_at")
+  status     Status
+  content    String
+  categories PostCategory[]
+  user       User           @relation(fields: [authorId], references: [id])
+  authorId   Int            @map("author_id")
+  like       Like[]
+  comments   Comment[]
+}
+
+model Category {
+  id           Int            @id @default(autoincrement())
+  title        String
+  description  String
+  postCategory PostCategory[]
+}
+
+model PostCategory {
+  postId     Int      @map("post_id")
+  categoryId Int      @map("category_id")
+  post       Post     @relation(fields: [postId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  @@id([postId, categoryId])
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [authorId], references: [id])
+  authorId  Int      @map("author_id")
+  publishAt DateTime @default(now()) @map("publish_at")
+  content   String
+  like      Like[]
+  post      Post?    @relation(fields: [postId], references: [id])
+  postId    Int?     @map("post_id")
+}
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [authorId], references: [id])
+  authorId  Int      @map("author_id")
+  publishAt DateTime @default(now()) @map("publish_at")
+  post      Post?    @relation(fields: [postId], references: [id])
+  postId    Int?     @map("post_id")
+  comment   Comment? @relation(fields: [commentId], references: [id])
+  commentId Int?     @map("comment_id")
+  type      Type
+}
+
+enum Type {
+  LIKE
+  DISLIKE
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
+}
