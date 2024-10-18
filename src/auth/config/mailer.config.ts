@@ -7,12 +7,12 @@ export const mailerConfig: MailerOptions = {
 		port: 465,
 		secure: true,
 		auth: {
-			user: '---',
-			pass: '---'
+			user: 'zhupanovandrey05@gmail.com',
+			pass: 'zuiy lnly scyz kxye'
 		}
 	},
 	defaults: {
-		from: '"SpeakAboutIt" <speakaboutit@gmail.com>'
+		from: '"Speak About It" <speakaboutit@gmail.com>'
 	},
 	template: {
 		dir: __dirname,

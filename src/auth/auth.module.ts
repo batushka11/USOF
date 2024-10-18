@@ -7,7 +7,7 @@ import { mailerConfig } from 'src/auth/config/mailer.config'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
-import { JwtStrategy } from './jwt.strategy'
+import { JwtStrategy } from './strategy/jwt.strategy'
 
 @Module({
 	controllers: [AuthController],

@@ -9,6 +9,7 @@ import {
 import { JwtService } from '@nestjs/jwt'
 import { User } from '@prisma/client'
 import { hash, verify } from 'argon2'
+import { Request, Response } from 'express'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { v4 } from 'uuid'
 import { LoginDto } from './dto/login.dto'
@@ -22,14 +23,20 @@ export class AuthService {
 		private mailerService: MailerService
 	) {}
 
-	async login(dto: LoginDto) {
+	async login(dto: LoginDto, res: Response) {
 		const user = await this.validateUser(dto)
 		const tokens = await this.tokens(user.id)
 
-		return {
+		res.cookie('refreshToken', tokens.refreshToken, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === 'production',
+			sameSite: 'strict',
+			maxAge: 7 * 24 * 60 * 60 * 1000
+		})
+		res.send({
 			user: this.returnUserFields(user),
-			...tokens
-		}
+			accessToken: tokens.accessToken
+		})
 	}
 
 	async register(dto: RegisterDto) {
@@ -162,6 +169,41 @@ export class AuthService {
 		} catch {
 			throw new UnauthorizedException('Token is invalid or has expired')
 		}
+	}
+
+	async refreshTokens(req: Request, res: Response) {
+		const refreshToken = req.cookies['refreshToken']
+		if (!refreshToken) throw new UnauthorizedException('No refresh token found')
+
+		try {
+			const result = await this.jwt.verifyAsync(refreshToken)
+			const user = await this.prisma.user.findUnique({
+				where: {
+					id: result.id
+				}
+			})
+
+			const tokens = await this.tokens(user.id)
+
+			res.cookie('refreshToken', tokens.refreshToken, {
+				httpOnly: true,
+				secure: process.env.NODE_ENV === 'production',
+				sameSite: 'strict',
+				maxAge: 7 * 24 * 60 * 60 * 1000
+			})
+
+			return {
+				user: this.returnUserFields(user),
+				accessToken: tokens.accessToken
+			}
+		} catch (e) {
+			throw new UnauthorizedException('Invalid refresh token')
+		}
+	}
+
+	async logout(res: Response) {
+		res.clearCookie('refreshToken')
+		res.send({ message: 'Logged out successfully' })
 	}
 
 	private async sendConfirmationEmail(
