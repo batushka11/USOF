@@ -7,17 +7,21 @@ import {
 	ParseIntPipe,
 	Patch,
 	Post,
-	UseGuards
+	UploadedFile,
+	UseFilters,
+	UseGuards,
+	UseInterceptors
 } from '@nestjs/common'
-import { Role } from '@prisma/client'
+import { Role, User } from '@prisma/client'
 import { CurrentUser } from 'src/auth/decorators/user.decorator'
 import { Auth } from '../auth/decorators/auth.decorator'
 import { Roles } from './decorators/role.decorator'
-import { AvatarDto } from './dto/avatar.dto'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
+import { HttpExceptionFilter } from './filter/http-exception.filter'
 import { RolesGuard } from './guards/role.guard'
 import { UserService } from './user.service'
+import { avatarFileInterceptor } from './util/file-upload.util'
 
 @Controller('users')
 @UseGuards(RolesGuard)
@@ -45,19 +49,32 @@ export class UserController {
 
 	@Auth()
 	@Patch('/avatar')
-	async addAvatar(@CurrentUser('id') id: number, @Body() avatarDto: AvatarDto) {
-		return this.userService.updateUserAvatar(id, avatarDto.path)
+	@UseInterceptors(avatarFileInterceptor())
+	@UseFilters(new HttpExceptionFilter())
+	async addAvatar(
+		@CurrentUser('id') id: number,
+		@UploadedFile() file: Express.Multer.File
+	) {
+		const filePath = `/avatars/${file.filename}`
+		return this.userService.updateUserAvatar(id, filePath)
 	}
 
 	@Auth()
 	@Patch('/:id')
-	async updateUserInfo(@Body() dto: UpdateUserDto, @Param('id') id: number) {
-		return this.userService.updateUser(id, dto)
+	async updateUserInfo(
+		@Body() dto: UpdateUserDto,
+		@Param('id', ParseIntPipe) id: number,
+		@CurrentUser() user: User
+	) {
+		return this.userService.updateUser(id, dto, user)
 	}
 
 	@Auth()
 	@Delete('/:id')
-	async deleteUser(@Param('id', ParseIntPipe) id: number) {
-		return this.userService.removeById(id)
+	async deleteUser(
+		@Param('id', ParseIntPipe) id: number,
+		@CurrentUser() user: User
+	) {
+		return this.userService.removeById(id, user)
 	}
 }

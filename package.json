@@ -27,7 +27,8 @@
 		"@nestjs/jwt": "^10.2.0",
 		"@nestjs/mapped-types": "*",
 		"@nestjs/passport": "^10.0.3",
-		"@nestjs/platform-express": "^10.4.4",
+		"@nestjs/platform-express": "^10.4.5",
+		"@nestjs/serve-static": "^4.0.2",
 		"@prisma/client": "^5.20.0",
 		"argon2": "^0.41.1",
 		"class-transformer": "^0.5.1",
@@ -38,6 +39,7 @@
 		"passport-jwt": "^4.0.1",
 		"reflect-metadata": "^0.2.0",
 		"rxjs": "^7.8.1",
+		"serve-static": "^1.16.2",
 		"uuid": "^10.0.0"
 	},
 	"overrides": {
@@ -51,6 +53,7 @@
 		"@nestjs/testing": "^10.4.4",
 		"@types/express": "^4.17.17",
 		"@types/jest": "^29.5.2",
+		"@types/multer": "^1.4.12",
 		"@types/node": "^20.3.1",
 		"@types/nodemailer": "^6.4.16",
 		"@types/supertest": "^6.0.0",
