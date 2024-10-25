@@ -124,7 +124,7 @@ export class AuthService {
 		await this.mailerService.sendMail({
 			to: email,
 			subject: 'Password reset',
-			template: '../../../src/templates/reset_pwd.hbs',
+			template: 'reset_pwd.hbs',
 			context: {
 				url: url,
 				username: user.login
@@ -215,7 +215,7 @@ export class AuthService {
 		await this.mailerService.sendMail({
 			to: email,
 			subject: 'Email confirmation',
-			template: '../../../src/templates/email.hbs',
+			template: 'email.hbs',
 			context: {
 				url: url,
 				username: username

@@ -32,7 +32,8 @@ model Post {
   id         Int            @id @default(autoincrement())
   publishAt  DateTime       @default(now()) @map("publish_at")
   status     Status
-  content    String
+  content    String         @db.Text
+  title      String         @db.Text
   categories PostCategory[]
   user       User           @relation(fields: [authorId], references: [id])
   authorId   Int            @map("author_id")
@@ -42,7 +43,7 @@ model Post {
 
 model Category {
   id           Int            @id @default(autoincrement())
-  title        String
+  title        String         @db.Text
   description  String
   postCategory PostCategory[]
 }
@@ -61,7 +62,7 @@ model Comment {
   user      User     @relation(fields: [authorId], references: [id])
   authorId  Int      @map("author_id")
   publishAt DateTime @default(now()) @map("publish_at")
-  content   String
+  content   String   @db.Text
   like      Like[]
   post      Post?    @relation(fields: [postId], references: [id])
   postId    Int?     @map("post_id")
@@ -77,6 +78,9 @@ model Like {
   comment   Comment? @relation(fields: [commentId], references: [id])
   commentId Int?     @map("comment_id")
   type      Type
+
+  @@unique([postId, authorId])
+  @@unique([commentId, authorId])
 }
 
 enum Type {
