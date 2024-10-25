@@ -13,8 +13,8 @@ import { User } from '@prisma/client'
 import { Auth } from 'src/auth/decorators/auth.decorator'
 import { CurrentUser } from 'src/auth/decorators/user.decorator'
 import { RolesGuard } from 'src/user/guards/role.guard'
-import { createPost } from './dto/create_post.dto'
-import { updatePostDto } from './dto/update_post.dto'
+import { CreatePostDto } from './dto/create_post.dto'
+import { UpdatePostDto } from './dto/update_post.dto'
 import { PostsService } from './posts.service'
 
 @Auth()
@@ -58,8 +58,8 @@ export class PostsController {
 	}
 
 	@Post('/')
-	async createPost(@Body() dto: createPost) {
-		return this.postsService.createPost(dto)
+	async createPost(@Body() dto: CreatePostDto, @CurrentUser('id') id: number) {
+		return this.postsService.createPost(dto, id)
 	}
 
 	@Post('/:id/like')
@@ -73,7 +73,7 @@ export class PostsController {
 	@Patch('/:id')
 	async updatePostById(
 		@Param('id', ParseIntPipe) postId: number,
-		@Body() dto: updatePostDto,
+		@Body() dto: UpdatePostDto,
 		@CurrentUser('id') userId: number
 	) {
 		return this.postsService.updatePostById(postId, dto, userId)

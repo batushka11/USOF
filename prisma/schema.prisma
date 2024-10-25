@@ -43,8 +43,8 @@ model Post {
 
 model Category {
   id           Int            @id @default(autoincrement())
-  title        String         @db.Text
-  description  String
+  title        String         @unique
+  description  String         @db.Text
   postCategory PostCategory[]
 }
 

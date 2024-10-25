@@ -16,7 +16,7 @@ export const mailerConfig: MailerOptions = {
 		from: '"Speak About It" <speakaboutit@gmail.com>'
 	},
 	template: {
-		dir: path.join(process.cwd(), 'src', 'templates'), // Используем абсолютный путь
+		dir: path.join(process.cwd(), 'src', 'templates'),
 		adapter: new HandlebarsAdapter(),
 		options: {
 			strict: true
