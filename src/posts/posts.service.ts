@@ -1,6 +1,6 @@
 import {
-	BadRequestException,
 	ConflictException,
+	ForbiddenException,
 	Injectable,
 	NotFoundException
 } from '@nestjs/common'
@@ -84,11 +84,8 @@ export class PostsService {
 					where: { title }
 				})
 
-				if (!category) {
-					category = await this.prisma.category.create({
-						data: { title, description: '' }
-					})
-				}
+				if (!category)
+					throw new NotFoundException('This category doesn’t exist')
 
 				return { id: category.id }
 			})
@@ -146,11 +143,11 @@ export class PostsService {
 		return this.interactWithPost(postId, authorId, 'DISLIKE')
 	}
 
-	async updatePostById(postId: number, dto: UpdatePostDto, authorId: number) {
+	async updatePostById(postId: number, dto: UpdatePostDto, author: User) {
 		const post = await this.findPostOrFail(postId)
 
-		if (post.authorId !== authorId) {
-			throw new BadRequestException('User with this id cannot update this post')
+		if (post.authorId !== author.id && author.role !== Role.ADMIN) {
+			throw new ForbiddenException('User with this id cannot update this post')
 		}
 
 		const categoryIds = await this.handleCategories(dto.categories)
@@ -178,7 +175,7 @@ export class PostsService {
 		const post = await this.findPostOrFail(postId)
 
 		if (post.authorId !== user.id && user.role !== Role.ADMIN) {
-			throw new BadRequestException('User with this id cannot delete this post')
+			throw new ForbiddenException('User with this id cannot delete this post')
 		}
 
 		return this.prisma.post.delete({ where: { id: postId } })

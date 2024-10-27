@@ -17,6 +17,7 @@ import { CreatePostDto } from './dto/create_post.dto'
 import { UpdatePostDto } from './dto/update_post.dto'
 import { PostsService } from './posts.service'
 
+//TODO: Update comment, maybe add image to post content
 @Auth()
 @Controller('posts')
 @UseGuards(RolesGuard)
@@ -47,6 +48,15 @@ export class PostsController {
 		return this.postsService.addCommentByPostId(idPost, content, idAuthor)
 	}
 
+	// @Patch('/:id/comments')
+	// async updateCommentByPostId(
+	// 	@Param('id', ParseIntPipe) idPost: number,
+	// 	content: string,
+	// 	@CurrentUser('id') idAuthor: number
+	// ) {
+	// 	return this.postsService.updateCommentByPostId(idPost, content, idAuthor)
+	// }
+
 	@Get('/:id/categories')
 	async getCategoriesByPostId(@Param('id', ParseIntPipe) id: number) {
 		return this.postsService.getCategoriesByPostId(id)
@@ -74,9 +84,9 @@ export class PostsController {
 	async updatePostById(
 		@Param('id', ParseIntPipe) postId: number,
 		@Body() dto: UpdatePostDto,
-		@CurrentUser('id') userId: number
+		@CurrentUser() user: User
 	) {
-		return this.postsService.updatePostById(postId, dto, userId)
+		return this.postsService.updatePostById(postId, dto, user)
 	}
 
 	@Delete('/:id')

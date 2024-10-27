@@ -7,6 +7,7 @@ import { PrismaModule } from './prisma/prisma.module'
 import { PrismaService } from './prisma/prisma.service'
 import { UserModule } from './user/user.module'
 import { PostsModule } from './posts/posts.module';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
 	imports: [
@@ -18,7 +19,8 @@ import { PostsModule } from './posts/posts.module';
 			rootPath: join(__dirname, '..', 'public/avatars'),
 			serveRoot: '/avatars'
 		}),
-		PostsModule
+		PostsModule,
+		CategoriesModule
 	],
 	controllers: [],
 	providers: [PrismaService]
