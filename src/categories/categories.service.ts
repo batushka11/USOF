@@ -1,5 +1,4 @@
 import {
-	BadRequestException,
 	ConflictException,
 	Injectable,
 	NotFoundException
@@ -13,20 +12,16 @@ export class CategoriesService {
 	constructor(private prisma: PrismaService) {}
 
 	async findCategoryByIdOrFail(id: number) {
-		const category = this.prisma.category.findUnique({ where: { id } })
+		const category = await this.prisma.category.findUnique({ where: { id } })
 		if (!category)
-			throw new BadRequestException('Category with this id doesn’t exist')
-
+			throw new NotFoundException('Category with this id doesn’t exist')
 		return category
 	}
 
-	async finCategoryByTitleOrFail(title: string) {
-		const category = this.prisma.category.findUnique({
-			where: { title }
-		})
-
+	async findCategoryByTitleOrFail(title: string) {
+		const category = await this.prisma.category.findUnique({ where: { title } })
 		if (category)
-			throw new ConflictException('Category with this title already exist')
+			throw new ConflictException('Category with this title already exists')
 	}
 
 	async getAllCategories() {
@@ -38,38 +33,30 @@ export class CategoriesService {
 	}
 
 	async getPostsByCategoryId(id: number) {
-		const posts = this.prisma.category.findMany({
+		const posts = await this.prisma.category.findMany({
 			where: { id },
-			include: {
-				postCategory: true
-			}
+			include: { postCategory: true }
 		})
 
-		if (!posts)
-			throw new NotFoundException('None post associated with this category')
-
+		if (posts.length === 0)
+			throw new NotFoundException('No posts associated with this category')
 		return posts
 	}
 
 	async createCategory(dto: CreateCategoryDto) {
-		await this.finCategoryByTitleOrFail(dto.title)
-
-		return this.prisma.category.create({
-			data: {
-				...dto
-			}
-		})
+		await this.findCategoryByTitleOrFail(dto.title)
+		return this.prisma.category.create({ data: { ...dto } })
 	}
 
 	async updateCategory(dto: UpdateCategoryDto, id: number) {
-		await this.findCategoryByIdOrFail(id)
-		await this.finCategoryByTitleOrFail(dto.title)
+		const category = await this.findCategoryByIdOrFail(id)
+		if (dto.title && dto.title !== category.title) {
+			await this.findCategoryByTitleOrFail(dto.title)
+		}
 
 		return this.prisma.category.update({
 			where: { id },
-			data: {
-				...dto
-			}
+			data: { ...dto }
 		})
 	}
 

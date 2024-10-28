@@ -12,6 +12,7 @@ import {
 	UseGuards,
 	UseInterceptors
 } from '@nestjs/common'
+import { AuthGuard } from '@nestjs/passport'
 import { Role, User } from '@prisma/client'
 import { CurrentUser } from 'src/auth/decorators/user.decorator'
 import { Auth } from '../auth/decorators/auth.decorator'
@@ -24,7 +25,7 @@ import { UserService } from './user.service'
 import { avatarFileInterceptor } from './util/file-upload.util'
 
 @Controller('users')
-@UseGuards(RolesGuard)
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 export class UserController {
 	constructor(private readonly userService: UserService) {}
 

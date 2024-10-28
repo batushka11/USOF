@@ -9,6 +9,7 @@ import {
 	Post,
 	UseGuards
 } from '@nestjs/common'
+import { AuthGuard } from '@nestjs/passport'
 import { Role } from '@prisma/client'
 import { Auth } from 'src/auth/decorators/auth.decorator'
 import { Roles } from 'src/user/decorators/role.decorator'
@@ -18,7 +19,7 @@ import { CreateCategoryDto } from './dto/create_category.dto'
 import { UpdateCategoryDto } from './dto/update_category.dto'
 
 @Auth()
-@UseGuards(RolesGuard)
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 @Controller('categories')
 export class CategoriesController {
 	constructor(private readonly categoriesService: CategoriesService) {}
