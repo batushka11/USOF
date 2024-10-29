@@ -119,7 +119,8 @@ export class PostsService {
 		authorId: number,
 		interactionType: Type
 	) {
-		await this.findPostOrFail(postId)
+		const post = await this.findPostOrFail(postId)
+		if (post.authorId !== authorId) throw new ForbiddenException()
 
 		const existingInteraction = await this.prisma.like.findFirst({
 			where: { postId, authorId }
@@ -145,7 +146,9 @@ export class PostsService {
 	}
 
 	async deleteLikeByPostId(postId: number, authorId: number) {
-		await this.findPostOrFail(postId)
+		const post = await this.findPostOrFail(postId)
+		if (post.authorId !== authorId) throw new ForbiddenException()
+
 		const like = await this.prisma.like.findFirst({
 			where: {
 				authorId,

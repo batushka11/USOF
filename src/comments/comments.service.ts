@@ -39,7 +39,8 @@ export class CommentsService {
 		authorId: number,
 		interactionType: Type
 	) {
-		await this.findCommentOrFail(commentId)
+		const comment = await this.findCommentOrFail(commentId)
+		if (comment.authorId !== authorId) throw new ForbiddenException()
 
 		const existingInteraction = await this.prisma.like.findFirst({
 			where: { commentId, authorId }
@@ -65,7 +66,9 @@ export class CommentsService {
 	}
 
 	async deleteLikeByCommentId(commentId: number, authorId: number) {
-		await this.findCommentOrFail(commentId)
+		const comment = await this.findCommentOrFail(commentId)
+		if (comment.authorId !== authorId) throw new ForbiddenException()
+
 		const like = await this.prisma.like.findFirst({
 			where: {
 				authorId,
@@ -85,8 +88,7 @@ export class CommentsService {
 		dto: UpdateCommentDto
 	) {
 		const comment = await this.findCommentOrFail(commentId)
-		if (comment.authorId !== authorId)
-			throw new ForbiddenException('User with this id can not update comment')
+		if (comment.authorId !== authorId) throw new ForbiddenException()
 
 		return this.prisma.comment.update({
 			where: { id: commentId, authorId },
@@ -96,8 +98,7 @@ export class CommentsService {
 
 	async deleteCommentById(commentId: number, authorId: number) {
 		const comment = await this.findCommentOrFail(commentId)
-		if (comment.authorId !== authorId)
-			throw new ForbiddenException('User with this id can not delete comment')
+		if (comment.authorId !== authorId) throw new ForbiddenException()
 
 		return this.prisma.comment.delete({
 			where: { id: commentId, authorId }
