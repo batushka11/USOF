@@ -11,14 +11,14 @@ import { UpdateCategoryDto } from './dto/update_category.dto'
 export class CategoriesService {
 	constructor(private prisma: PrismaService) {}
 
-	async findCategoryByIdOrFail(id: number) {
+	async ensureCategoryByIdExists(id: number) {
 		const category = await this.prisma.category.findUnique({ where: { id } })
 		if (!category)
 			throw new NotFoundException('Category with this id doesn’t exist')
 		return category
 	}
 
-	async findCategoryByTitleOrFail(title: string) {
+	async ensureCategoryTitleUnique(title: string) {
 		const category = await this.prisma.category.findUnique({ where: { title } })
 		if (category)
 			throw new ConflictException('Category with this title already exists')
@@ -29,10 +29,12 @@ export class CategoriesService {
 	}
 
 	async getCategoryById(id: number) {
-		return this.findCategoryByIdOrFail(id)
+		return this.ensureCategoryByIdExists(id)
 	}
 
 	async getPostsByCategoryId(id: number) {
+		await this.ensureCategoryByIdExists(id)
+
 		const posts = await this.prisma.category.findMany({
 			where: { id },
 			include: { postCategory: true }
@@ -44,14 +46,15 @@ export class CategoriesService {
 	}
 
 	async createCategory(dto: CreateCategoryDto) {
-		await this.findCategoryByTitleOrFail(dto.title)
+		await this.ensureCategoryTitleUnique(dto.title)
 		return this.prisma.category.create({ data: { ...dto } })
 	}
 
 	async updateCategory(dto: UpdateCategoryDto, id: number) {
-		const category = await this.findCategoryByIdOrFail(id)
+		const category = await this.ensureCategoryByIdExists(id)
+
 		if (dto.title && dto.title !== category.title) {
-			await this.findCategoryByTitleOrFail(dto.title)
+			await this.ensureCategoryTitleUnique(dto.title)
 		}
 
 		return this.prisma.category.update({
@@ -61,7 +64,7 @@ export class CategoriesService {
 	}
 
 	async deleteCategory(id: number) {
-		await this.findCategoryByIdOrFail(id)
+		await this.ensureCategoryByIdExists(id)
 		return this.prisma.category.delete({ where: { id } })
 	}
 }

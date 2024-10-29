@@ -13,25 +13,26 @@ import { UpdateCommentDto } from './dto/update_comment.dto'
 export class CommentsService {
 	constructor(private prisma: PrismaService) {}
 
-	async findCommentOrFail(id: number) {
+	private async getCommentOrFail(id: number) {
 		const comment = await this.prisma.comment.findUnique({ where: { id } })
-
 		if (!comment)
 			throw new NotFoundException('Comment with this id doesn’t exist')
-
 		return comment
 	}
 
+	private ensureCommentAuthor(comment, authorId: number) {
+		if (comment.authorId !== authorId) {
+			throw new ForbiddenException()
+		}
+	}
+
 	async getCommentById(id: number) {
-		return await this.findCommentOrFail(id)
+		return this.getCommentOrFail(id)
 	}
 
 	async getLikesByCommentId(id: number) {
-		await this.findCommentOrFail(id)
-
-		const likes = await this.prisma.like.findMany({ where: { commentId: id } })
-
-		return likes
+		await this.getCommentOrFail(id)
+		return this.prisma.like.findMany({ where: { commentId: id } })
 	}
 
 	async interactWithComment(
@@ -39,8 +40,8 @@ export class CommentsService {
 		authorId: number,
 		interactionType: Type
 	) {
-		const comment = await this.findCommentOrFail(commentId)
-		if (comment.authorId !== authorId) throw new ForbiddenException()
+		const comment = await this.getCommentOrFail(commentId)
+		this.ensureCommentAuthor(comment, authorId)
 
 		const existingInteraction = await this.prisma.like.findFirst({
 			where: { commentId, authorId }
@@ -66,14 +67,11 @@ export class CommentsService {
 	}
 
 	async deleteLikeByCommentId(commentId: number, authorId: number) {
-		const comment = await this.findCommentOrFail(commentId)
-		if (comment.authorId !== authorId) throw new ForbiddenException()
+		const comment = await this.getCommentOrFail(commentId)
+		this.ensureCommentAuthor(comment, authorId)
 
 		const like = await this.prisma.like.findFirst({
-			where: {
-				authorId,
-				commentId
-			}
+			where: { authorId, commentId }
 		})
 
 		if (!like)
@@ -87,8 +85,8 @@ export class CommentsService {
 		authorId: number,
 		dto: UpdateCommentDto
 	) {
-		const comment = await this.findCommentOrFail(commentId)
-		if (comment.authorId !== authorId) throw new ForbiddenException()
+		const comment = await this.getCommentOrFail(commentId)
+		this.ensureCommentAuthor(comment, authorId)
 
 		return this.prisma.comment.update({
 			where: { id: commentId, authorId },
@@ -97,8 +95,8 @@ export class CommentsService {
 	}
 
 	async deleteCommentById(commentId: number, authorId: number) {
-		const comment = await this.findCommentOrFail(commentId)
-		if (comment.authorId !== authorId) throw new ForbiddenException()
+		const comment = await this.getCommentOrFail(commentId)
+		this.ensureCommentAuthor(comment, authorId)
 
 		return this.prisma.comment.delete({
 			where: { id: commentId, authorId }
