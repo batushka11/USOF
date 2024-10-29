@@ -8,6 +8,7 @@ import { PrismaService } from './prisma/prisma.service'
 import { UserModule } from './user/user.module'
 import { PostsModule } from './posts/posts.module';
 import { CategoriesModule } from './categories/categories.module';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
 	imports: [
@@ -20,7 +21,8 @@ import { CategoriesModule } from './categories/categories.module';
 			serveRoot: '/avatars'
 		}),
 		PostsModule,
-		CategoriesModule
+		CategoriesModule,
+		CommentsModule
 	],
 	controllers: [],
 	providers: [PrismaService]

@@ -12,6 +12,7 @@ import {
 import { User } from '@prisma/client'
 import { Auth } from 'src/auth/decorators/auth.decorator'
 import { CurrentUser } from 'src/auth/decorators/user.decorator'
+import { CreateLikeDto } from 'src/comments/dto/create_like.dto'
 import { RolesGuard } from 'src/user/guards/role.guard'
 import { CreatePostDto } from './dto/create_post.dto'
 import { UpdatePostDto } from './dto/update_post.dto'
@@ -73,11 +74,12 @@ export class PostsController {
 	}
 
 	@Post('/:id/like')
-	async likePost(
+	async createLikeByPostId(
 		@Param('id', ParseIntPipe) postId: number,
-		@CurrentUser('id') userId: number
+		@CurrentUser('id') userId: number,
+		@Body() dto: CreateLikeDto
 	) {
-		return this.postsService.likePost(postId, userId)
+		return this.postsService.createLikeByPostId(postId, userId, dto)
 	}
 
 	@Patch('/:id')
@@ -98,10 +100,10 @@ export class PostsController {
 	}
 
 	@Delete('/:id/like')
-	async dislikePost(
+	async deleteLikeByPostId(
 		@Param('id', ParseIntPipe) postId: number,
 		@CurrentUser('id') userId: number
 	) {
-		return this.postsService.dislikePost(postId, userId)
+		return this.postsService.deleteLikeByPostId(postId, userId)
 	}
 }

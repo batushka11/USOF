@@ -4,7 +4,8 @@ import {
 	Injectable,
 	NotFoundException
 } from '@nestjs/common'
-import { Role, User } from '@prisma/client'
+import { Role, Type, User } from '@prisma/client'
+import { CreateLikeDto } from 'src/comments/dto/create_like.dto'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { CreatePostDto } from './dto/create_post.dto'
 import { UpdatePostDto } from './dto/update_post.dto'
@@ -116,7 +117,7 @@ export class PostsService {
 	async interactWithPost(
 		postId: number,
 		authorId: number,
-		interactionType: 'LIKE' | 'DISLIKE'
+		interactionType: Type
 	) {
 		await this.findPostOrFail(postId)
 
@@ -135,12 +136,27 @@ export class PostsService {
 		})
 	}
 
-	async likePost(postId: number, authorId: number) {
-		return this.interactWithPost(postId, authorId, 'LIKE')
+	async createLikeByPostId(
+		postId: number,
+		authorId: number,
+		dto: CreateLikeDto
+	) {
+		return this.interactWithPost(postId, authorId, dto.type)
 	}
 
-	async dislikePost(postId: number, authorId: number) {
-		return this.interactWithPost(postId, authorId, 'DISLIKE')
+	async deleteLikeByPostId(postId: number, authorId: number) {
+		await this.findPostOrFail(postId)
+		const like = await this.prisma.like.findFirst({
+			where: {
+				authorId,
+				postId
+			}
+		})
+
+		if (!like)
+			throw new NotFoundException('Like with this post id doesn’t exist')
+
+		return this.prisma.like.delete({ where: { id: like.id } })
 	}
 
 	async updatePostById(postId: number, dto: UpdatePostDto, author: User) {
