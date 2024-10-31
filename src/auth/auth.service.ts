@@ -192,12 +192,14 @@ export class AuthService {
 				maxAge: 7 * 24 * 60 * 60 * 1000
 			})
 
-			return {
+			return res.json({
 				user: this.returnUserFields(user),
 				accessToken: tokens.accessToken
-			}
+			})
 		} catch (e) {
-			throw new UnauthorizedException('Invalid refresh token')
+			throw new UnauthorizedException(
+				'Invalid or expired refresh token in cookie'
+			)
 		}
 	}
 

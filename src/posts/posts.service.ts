@@ -53,8 +53,12 @@ export class PostsService {
 		}
 	}
 
-	async getPostById(id: number) {
-		return this.findPostOrFail(id)
+	async getPostById(id: number, userRole: Role) {
+		const post = await this.findPostOrFail(id)
+		if (post.status === 'INACTIVE' && userRole !== 'ADMIN')
+			throw new ForbiddenException('User not authorized to see this post')
+
+		return post
 	}
 
 	async getCommentsByPostId(id: number, { page, limit, offset }: Pagination) {
@@ -107,11 +111,13 @@ export class PostsService {
 			}
 		})
 
-		if (!postWithCategories) {
+		if (!postWithCategories)
 			throw new NotFoundException('Post with this id doesn’t exist')
-		}
 
-		return postWithCategories
+		if (!postWithCategories.categories)
+			throw new NotFoundException('Post with this id doesn’t exist categories')
+
+		return postWithCategories.categories
 	}
 
 	async getLikesByPostId(id: number) {
@@ -124,7 +130,7 @@ export class PostsService {
 			throw new NotFoundException('Post with this id doesn’t exist')
 		}
 
-		return postWithLikes
+		return postWithLikes.like
 	}
 
 	private async handleCategories(categoryTitles: string[]) {

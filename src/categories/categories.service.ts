@@ -3,6 +3,7 @@ import {
 	Injectable,
 	NotFoundException
 } from '@nestjs/common'
+import { Status, User } from '@prisma/client'
 import { Pagination } from 'src/pagination/pagination.interface'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { CreateCategoryDto } from './dto/create_category.dto'
@@ -55,16 +56,24 @@ export class CategoriesService {
 		return this.ensureCategoryByIdExists(id)
 	}
 
-	async getPostsByCategoryId(id: number) {
+	async getPostsByCategoryId(id: number, user: User) {
+		const status = user.role === 'USER' ? Status.ACTIVE : undefined
 		await this.ensureCategoryByIdExists(id)
 
-		const posts = await this.prisma.category.findMany({
-			where: { id },
-			include: { postCategory: true }
+		const posts = await this.prisma.post.findMany({
+			where: {
+				status,
+				categories: {
+					some: {
+						categoryId: id
+					}
+				}
+			}
 		})
-
-		if (posts.length === 0)
+		if (posts.length === 0) {
 			throw new NotFoundException('No posts associated with this category')
+		}
+
 		return posts
 	}
 
