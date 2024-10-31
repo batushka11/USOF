@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common'
 import { Role, User } from '@prisma/client'
 import { hash } from 'argon2'
+import { Pagination } from 'src/pagination/pagination_params.decorator'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
@@ -13,8 +14,30 @@ import { UpdateUserDto } from './dto/update-user.dto'
 export class UserService {
 	constructor(private prisma: PrismaService) {}
 
-	async getAllUsers() {
-		return this.prisma.user.findMany()
+	async getAllUsers({ page, limit, size, offset }: Pagination) {
+		const [users, totalCount] = await Promise.all([
+			this.prisma.post.findMany({
+				take: limit,
+				skip: offset
+			}),
+			this.prisma.post.count()
+		])
+
+		const totalPages = Math.ceil(totalCount / limit)
+		const hasNextPage = page < totalPages
+		const hasPreviousPage = page > 1
+		const nextPage = hasNextPage ? page + 1 : null
+		const previousPage = hasPreviousPage ? page - 1 : null
+
+		return {
+			users,
+			totalCount,
+			page,
+			limit,
+			totalPages,
+			nextPage,
+			previousPage
+		}
 	}
 
 	async getUserById(id: number) {

@@ -10,11 +10,17 @@ import {
 	UploadedFile,
 	UseFilters,
 	UseGuards,
-	UseInterceptors
+	UseInterceptors,
+	UsePipes,
+	ValidationPipe
 } from '@nestjs/common'
 import { AuthGuard } from '@nestjs/passport'
 import { Role, User } from '@prisma/client'
 import { CurrentUser } from 'src/auth/decorators/user.decorator'
+import {
+	Pagination,
+	PaginationParams
+} from 'src/pagination/pagination_params.decorator'
 import { Auth } from '../auth/decorators/auth.decorator'
 import { Roles } from './decorators/role.decorator'
 import { CreateUserDto } from './dto/create-user.dto'
@@ -31,8 +37,8 @@ export class UserController {
 
 	@Auth()
 	@Get()
-	async getUsers() {
-		return this.userService.getAllUsers()
+	async getUsers(@PaginationParams() paginationParams: Pagination) {
+		return this.userService.getAllUsers(paginationParams)
 	}
 
 	@Auth()
@@ -41,6 +47,7 @@ export class UserController {
 		return this.userService.getUserById(id)
 	}
 
+	@UsePipes(new ValidationPipe())
 	@Auth()
 	@Roles(Role.ADMIN)
 	@Post()
@@ -60,6 +67,7 @@ export class UserController {
 		return this.userService.updateUserAvatar(id, filePath)
 	}
 
+	@UsePipes(new ValidationPipe())
 	@Auth()
 	@Patch('/:id')
 	async updateUserInfo(

@@ -6,7 +6,9 @@ import {
 	Param,
 	ParseIntPipe,
 	Patch,
-	Post
+	Post,
+	UsePipes,
+	ValidationPipe
 } from '@nestjs/common'
 import { Auth } from 'src/auth/decorators/auth.decorator'
 import { CurrentUser } from 'src/auth/decorators/user.decorator'
@@ -30,6 +32,7 @@ export class CommentsController {
 		return this.commentsService.getLikesByCommentId(id)
 	}
 
+	@UsePipes(new ValidationPipe())
 	@Auth()
 	@Post('/:id/like')
 	async createLikeByCommentId(
@@ -40,6 +43,7 @@ export class CommentsController {
 		return this.commentsService.createLikesByCommentId(commentId, authorId, dto)
 	}
 
+	@UsePipes(new ValidationPipe())
 	@Auth()
 	@Patch('/:id')
 	async updateCommentById(

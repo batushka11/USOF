@@ -7,7 +7,9 @@ import {
 	ParseIntPipe,
 	Patch,
 	Post,
-	UseGuards
+	UseGuards,
+	UsePipes,
+	ValidationPipe
 } from '@nestjs/common'
 import { AuthGuard } from '@nestjs/passport'
 import { Role } from '@prisma/client'
@@ -39,12 +41,14 @@ export class CategoriesController {
 		return this.categoriesService.getPostsByCategoryId(id)
 	}
 
+	@UsePipes(new ValidationPipe())
 	@Roles(Role.ADMIN)
 	@Post()
 	async createCategory(@Body() dto: CreateCategoryDto) {
 		return this.categoriesService.createCategory(dto)
 	}
 
+	@UsePipes(new ValidationPipe())
 	@Roles(Role.ADMIN)
 	@Patch('/:id')
 	async updateCategory(

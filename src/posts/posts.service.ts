@@ -4,8 +4,9 @@ import {
 	Injectable,
 	NotFoundException
 } from '@nestjs/common'
-import { Role, Type, User } from '@prisma/client'
+import { Role, Status, Type, User } from '@prisma/client'
 import { CreateLikeDto } from 'src/comments/dto/create_like.dto'
+import { Pagination } from 'src/pagination/pagination_params.decorator'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { CreatePostDto } from './dto/create_post.dto'
 import { UpdatePostDto } from './dto/update_post.dto'
@@ -22,25 +23,73 @@ export class PostsService {
 		return post
 	}
 
-	async getAllPosts() {
-		return this.prisma.post.findMany()
+	async getAllPosts({ page, limit, offset }: Pagination, user: User) {
+		const status = user.role === 'USER' ? Status.ACTIVE : undefined
+		const [posts, totalCount] = await Promise.all([
+			this.prisma.post.findMany({
+				where: { status },
+				take: limit,
+				skip: offset
+			}),
+			this.prisma.post.count({
+				where: { status }
+			})
+		])
+
+		const totalPages = Math.ceil(totalCount / limit)
+		const hasNextPage = page < totalPages
+		const hasPreviousPage = page > 1
+		const nextPage = hasNextPage ? page + 1 : null
+		const previousPage = hasPreviousPage ? page - 1 : null
+
+		return {
+			posts,
+			totalCount,
+			page,
+			limit,
+			totalPages,
+			nextPage,
+			previousPage
+		}
 	}
 
 	async getPostById(id: number) {
 		return this.findPostOrFail(id)
 	}
 
-	async getCommentsByPostId(id: number) {
-		const postWithComments = await this.prisma.post.findUnique({
-			where: { id },
-			include: { comments: true }
-		})
+	async getCommentsByPostId(id: number, { page, limit, offset }: Pagination) {
+		const post = await this.prisma.post.findUnique({ where: { id } })
 
-		if (!postWithComments) {
+		if (!post) {
 			throw new NotFoundException('Post with this id doesn’t exist')
 		}
 
-		return postWithComments
+		const [comments, totalComments] = await Promise.all([
+			this.prisma.comment.findMany({
+				where: { postId: id },
+				take: limit,
+				skip: offset
+			}),
+			this.prisma.comment.count({ where: { postId: id } })
+		])
+
+		const totalPages = Math.ceil(totalComments / limit)
+		const hasNextPage = page < totalPages
+		const hasPreviousPage = page > 1
+		const nextPage = hasNextPage ? page + 1 : null
+		const previousPage = hasPreviousPage ? page - 1 : null
+
+		return {
+			comments,
+			totalComments,
+			page,
+			limit,
+			totalPages,
+			nextPage,
+			previousPage,
+			hasNextPage,
+			hasPreviousPage
+		}
 	}
 
 	async addCommentByPostId(postId: number, content: string, authorId: number) {
