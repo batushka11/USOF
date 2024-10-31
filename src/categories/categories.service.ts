@@ -3,6 +3,7 @@ import {
 	Injectable,
 	NotFoundException
 } from '@nestjs/common'
+import { Pagination } from 'src/pagination/pagination.interface'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { CreateCategoryDto } from './dto/create_category.dto'
 import { UpdateCategoryDto } from './dto/update_category.dto'
@@ -24,8 +25,30 @@ export class CategoriesService {
 			throw new ConflictException('Category with this title already exists')
 	}
 
-	async getAllCategories() {
-		return this.prisma.category.findMany()
+	async getAllCategories({ page, limit, offset }: Pagination) {
+		const [posts, totalCount] = await Promise.all([
+			this.prisma.post.findMany({
+				take: limit,
+				skip: offset
+			}),
+			this.prisma.post.count()
+		])
+
+		const totalPages = Math.ceil(totalCount / limit)
+		const hasNextPage = page < totalPages
+		const hasPreviousPage = page > 1
+		const nextPage = hasNextPage ? page + 1 : null
+		const previousPage = hasPreviousPage ? page - 1 : null
+
+		return {
+			posts,
+			totalCount,
+			page,
+			limit,
+			totalPages,
+			nextPage,
+			previousPage
+		}
 	}
 
 	async getCategoryById(id: number) {

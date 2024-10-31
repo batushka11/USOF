@@ -14,6 +14,10 @@ import {
 import { AuthGuard } from '@nestjs/passport'
 import { Role } from '@prisma/client'
 import { Auth } from 'src/auth/decorators/auth.decorator'
+import {
+	Pagination,
+	PaginationParams
+} from 'src/pagination/pagination_params.decorator'
 import { Roles } from 'src/user/decorators/role.decorator'
 import { RolesGuard } from 'src/user/guards/role.guard'
 import { CategoriesService } from './categories.service'
@@ -27,8 +31,8 @@ export class CategoriesController {
 	constructor(private readonly categoriesService: CategoriesService) {}
 
 	@Get()
-	async getAllCategories() {
-		return this.categoriesService.getAllCategories()
+	async getAllCategories(@PaginationParams() paginationParams: Pagination) {
+		return this.categoriesService.getAllCategories(paginationParams)
 	}
 
 	@Get('/:id')
