@@ -15,6 +15,7 @@ import {
 	ValidationPipe
 } from '@nestjs/common'
 import { AuthGuard } from '@nestjs/passport'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { Role, User } from '@prisma/client'
 import { CurrentUser } from 'src/auth/decorators/user.decorator'
 import {
@@ -30,32 +31,44 @@ import { RolesGuard } from './guards/role.guard'
 import { UserService } from './user.service'
 import { avatarFileInterceptor } from './util/file-upload.util'
 
+import {
+	ApiCreateUser,
+	ApiDeleteUser,
+	ApiGetAllUsers,
+	ApiGetUserById,
+	ApiUpdateUserAvatar,
+	ApiUpdateUserInfo
+} from '../docs/user/user.swagger'
+
+@ApiTags('Users')
+@ApiBearerAuth()
+@Auth()
 @Controller('users')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class UserController {
 	constructor(private readonly userService: UserService) {}
 
-	@Auth()
+	@ApiGetAllUsers()
 	@Get()
 	async getUsers(@PaginationParams() paginationParams: Pagination) {
 		return this.userService.getAllUsers(paginationParams)
 	}
 
-	@Auth()
+	@ApiGetUserById()
 	@Get('/:id')
 	async getUser(@Param('id', ParseIntPipe) id: number) {
 		return this.userService.getUserById(id)
 	}
 
 	@UsePipes(new ValidationPipe())
-	@Auth()
 	@Roles(Role.ADMIN)
+	@ApiCreateUser()
 	@Post()
 	async addUser(@Body() dto: CreateUserDto) {
 		return this.userService.createUser(dto)
 	}
 
-	@Auth()
+	@ApiUpdateUserAvatar()
 	@Patch('/avatar')
 	@UseInterceptors(avatarFileInterceptor())
 	@UseFilters(new HttpExceptionFilter())
@@ -67,8 +80,8 @@ export class UserController {
 		return this.userService.updateUserAvatar(id, filePath)
 	}
 
+	@ApiUpdateUserInfo()
 	@UsePipes(new ValidationPipe())
-	@Auth()
 	@Patch('/:id')
 	async updateUserInfo(
 		@Body() dto: UpdateUserDto,
@@ -78,7 +91,7 @@ export class UserController {
 		return this.userService.updateUser(id, dto, user)
 	}
 
-	@Auth()
+	@ApiDeleteUser()
 	@Delete('/:id')
 	async deleteUser(
 		@Param('id', ParseIntPipe) id: number,
