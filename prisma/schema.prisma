@@ -21,6 +21,7 @@ model User {
   rating       Int       @default(0)
   isConfirm    Boolean   @default(false) @map("is_confirm")
   confirmToken String?   @unique @map("confirm_token")
+  createdAt    DateTime  @default(now()) @map("created_at")
 }
 
 enum Role {
@@ -46,6 +47,7 @@ model Category {
   title        String         @unique
   description  String         @db.Text
   postCategory PostCategory[]
+  createdAt    DateTime       @default(now()) @map("created_at")
 }
 
 model PostCategory {

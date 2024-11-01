@@ -79,10 +79,11 @@ export class UserController {
 	@UseFilters(new HttpExceptionFilter())
 	async addAvatar(
 		@CurrentUser('id') id: number,
-		@UploadedFile() file: Express.Multer.File
+		@UploadedFile() file: Express.Multer.File,
+		@CurrentUser() user: User
 	) {
 		const filePath = `/avatars/${file.filename}`
-		return this.userService.updateUserAvatar(id, filePath)
+		return this.userService.updateUserAvatar(id, filePath, user)
 	}
 
 	@ApiUpdateUserInfo()

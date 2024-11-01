@@ -68,7 +68,15 @@ export class UserService {
 		return user
 	}
 
-	async updateUserAvatar(id: number, path: string) {
+	async updateUserAvatar(id: number, path: string, currentUser: User) {
+		const user = await this.prisma.user.findUnique({ where: { id } })
+
+		if (!user) throw new BadRequestException('User with this id doesn`t exist')
+
+		if (id !== currentUser.id)
+			throw new ForbiddenException(
+				'You don`t have access to update another user'
+			)
 		return this.prisma.user.update({
 			where: { id },
 			data: { avatarPath: path }
