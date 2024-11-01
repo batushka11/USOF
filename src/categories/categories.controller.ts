@@ -34,7 +34,7 @@ import {
 	ApiGetCategoryById,
 	ApiGetPostsByCategoryId,
 	ApiUpdateCategoryById
-} from '../docs/categories/categories.swagger'
+} from './docs/categories.swagger'
 
 @ApiTags('Categories')
 @ApiBearerAuth()

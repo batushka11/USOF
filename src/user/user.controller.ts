@@ -39,7 +39,7 @@ import {
 	ApiGetUserById,
 	ApiUpdateUserAvatar,
 	ApiUpdateUserInfo
-} from '../docs/user/user.swagger'
+} from './docs/user.swagger'
 
 @ApiTags('Users')
 @ApiBearerAuth()

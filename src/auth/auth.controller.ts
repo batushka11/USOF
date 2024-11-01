@@ -27,7 +27,7 @@ import {
 	ApiRegister,
 	ApiResetPassword,
 	ApiSendResetPassword
-} from '../docs/auth/auth.swagger'
+} from './docs/auth.swagger'
 
 @ApiTags('Authentication')
 @Controller('auth')

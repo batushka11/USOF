@@ -38,7 +38,7 @@ import {
 	ApiGetLikesByPostId,
 	ApiGetPostById,
 	ApiUpdatePostById
-} from '../docs/posts/posts.swagger'
+} from './docs/posts.swagger'
 
 @ApiTags('Posts')
 @ApiBearerAuth()

@@ -25,7 +25,7 @@ import {
 	ApiGetCommentById,
 	ApiGetLikesByCommentId,
 	ApiUpdateCommentById
-} from '../docs/comments/comments.swagger'
+} from './docs/comments.swagger'
 
 @Auth()
 @ApiTags('Comments')
