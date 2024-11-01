@@ -25,6 +25,8 @@
 		"@adminjs/nestjs": "^6.1.0",
 		"@adminjs/prisma": "^5.0.3",
 		"@adminjs/typeorm": "^5.0.1",
+		"@aws-sdk/client-s3": "^3.685.0",
+		"@aws-sdk/lib-storage": "^3.685.0",
 		"@faker-js/faker": "^9.0.3",
 		"@nestjs-modules/mailer": "^2.0.2",
 		"@nestjs/common": "^10.4.4",

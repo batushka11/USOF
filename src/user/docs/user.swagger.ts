@@ -133,7 +133,11 @@ export const ApiUpdateUserAvatar = () =>
 			status: 200,
 			description: 'Avatar updated successfully',
 			schema: {
-				example: { id: 1, avatarPath: '/avatars/user1.jpg' }
+				example: {
+					id: 1,
+					avatarPath:
+						'https://speakaboutit.s3.eu-north-1.amazonaws.com/18b7434d2-0436-4f59-1de7-d9b02ad505b9-2021-09-14+21.22.36.jpg'
+				}
 			}
 		}),
 		ApiResponse({
