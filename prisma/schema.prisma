@@ -35,7 +35,7 @@ model Post {
   content    String         @db.Text
   title      String         @db.Text
   categories PostCategory[]
-  user       User           @relation(fields: [authorId], references: [id])
+  user       User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId   Int            @map("author_id")
   like       Like[]
   comments   Comment[]
@@ -51,31 +51,31 @@ model Category {
 model PostCategory {
   postId     Int      @map("post_id")
   categoryId Int      @map("category_id")
-  post       Post     @relation(fields: [postId], references: [id])
-  category   Category @relation(fields: [categoryId], references: [id])
+  post       Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@id([postId, categoryId])
 }
 
 model Comment {
   id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [authorId], references: [id])
+  user      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId  Int      @map("author_id")
   publishAt DateTime @default(now()) @map("publish_at")
   content   String   @db.Text
   like      Like[]
-  post      Post?    @relation(fields: [postId], references: [id])
+  post      Post?    @relation(fields: [postId], references: [id], onDelete: SetNull)
   postId    Int?     @map("post_id")
 }
 
 model Like {
   id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [authorId], references: [id])
+  user      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId  Int      @map("author_id")
   publishAt DateTime @default(now()) @map("publish_at")
-  post      Post?    @relation(fields: [postId], references: [id])
+  post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    Int?     @map("post_id")
-  comment   Comment? @relation(fields: [commentId], references: [id])
+  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
   commentId Int?     @map("comment_id")
   type      Type
 
