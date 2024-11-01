@@ -81,7 +81,7 @@ export class UserController {
 		@CurrentUser('id') id: number,
 		@UploadedFile() file: Express.Multer.File
 	) {
-		const filePath = `/avatars/${file.filename}`
+		const filePath = `http://localhost:4200/avatars/${file.filename}`
 		return this.userService.updateUserAvatar(id, filePath)
 	}
 

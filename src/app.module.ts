@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { ServeStaticModule } from '@nestjs/serve-static'
-import { join } from 'path'
+import path from 'path'
 import { AdminModule } from './admin/admin.module'
 import { AuthModule } from './auth/auth.module'
 import { CategoriesModule } from './categories/categories.module'
@@ -18,7 +18,7 @@ import { UserModule } from './user/user.module'
 		PrismaModule,
 		UserModule,
 		ServeStaticModule.forRoot({
-			rootPath: join(__dirname, '..', 'public/avatars'),
+			rootPath: path.join(process.cwd(), 'public', 'avatars'),
 			serveRoot: '/avatars'
 		}),
 		PostsModule,
