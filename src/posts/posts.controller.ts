@@ -26,6 +26,10 @@ import { CreatePostDto } from './dto/create_post.dto'
 import { UpdatePostDto } from './dto/update_post.dto'
 import { PostsService } from './posts.service'
 
+import { Filtering } from 'src/filtering/filter.interface'
+import { FilteringParams } from 'src/filtering/filter_params.decorator'
+import { Sorting } from 'src/sorting/sort.interface'
+import { SortingParams } from 'src/sorting/sort_params.decorator'
 import {
 	ApiAddCommentByPostId,
 	ApiCreateLikeByPostId,
@@ -53,9 +57,12 @@ export class PostsController {
 	@Get()
 	async getAllPosts(
 		@PaginationParams() paginationParams: Pagination,
+		@SortingParams(['like', 'publishAt']) sortingParams: Sorting,
+		@FilteringParams(['category', 'startInterval', 'finishInterval', 'status'])
+		filteringParams: Filtering,
 		@CurrentUser() user: User
 	) {
-		return this.postsService.getAllPosts(paginationParams, user)
+		return this.postsService.getAllPosts(paginationParams, sortingParams, user)
 	}
 
 	@ApiGetPostById()

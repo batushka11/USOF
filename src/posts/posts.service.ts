@@ -8,6 +8,7 @@ import { Role, Status, Type, User } from '@prisma/client'
 import { CreateLikeDto } from 'src/comments/dto/create_like.dto'
 import { Pagination } from 'src/pagination/pagination_params.decorator'
 import { PrismaService } from 'src/prisma/prisma.service'
+import { Sorting } from 'src/sorting/sort.interface'
 import { CreatePostDto } from './dto/create_post.dto'
 import { UpdatePostDto } from './dto/update_post.dto'
 
@@ -23,13 +24,24 @@ export class PostsService {
 		return post
 	}
 
-	async getAllPosts({ page, limit, offset }: Pagination, user: User) {
+	async getAllPosts(
+		{ page, limit, offset }: Pagination,
+		{ property, direction }: Sorting,
+		user: User
+	) {
 		const status = user.role === 'USER' ? Status.ACTIVE : undefined
+
+		const orderBy =
+			property === 'like'
+				? { like: { _count: direction } }
+				: { [property]: direction }
+
 		const [posts, totalCount] = await Promise.all([
 			this.prisma.post.findMany({
 				where: { status },
 				take: limit,
-				skip: offset
+				skip: offset,
+				orderBy
 			}),
 			this.prisma.post.count({
 				where: { status }

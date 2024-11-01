@@ -1,2 +1,50 @@
 [] - add checks in user service
 [] - add file to save ava in user service
+
+async getAllPosts(
+		{ page, limit }: Pagination,
+		{ direction }: Sorting,
+		user: User
+	) {
+		const status = user.role === 'USER' ? Status.ACTIVE : undefined
+
+		const allPosts = await this.prisma.post.findMany({
+			where: { status },
+			include: {
+				like: {
+					where: { type: 'LIKE' }
+				}
+			}
+		})
+
+		const sortedPosts = allPosts
+			.map(post => {
+				const likeCount = post.like.length
+				const { like, ...postWithoutLikes } = post
+				return { ...postWithoutLikes, likeCount }
+			})
+			.sort((a, b) => {
+				const compare = a.likeCount - b.likeCount
+				return direction === 'asc' ? compare : -compare
+			})
+
+		const offset = (page - 1) * limit
+		const paginatedPosts = sortedPosts.slice(offset, offset + limit)
+
+		const totalCount = sortedPosts.length
+		const totalPages = Math.ceil(totalCount / limit)
+		const hasNextPage = page < totalPages
+		const hasPreviousPage = page > 1
+		const nextPage = hasNextPage ? page + 1 : null
+		const previousPage = hasPreviousPage ? page - 1 : null
+
+		return {
+			posts: paginatedPosts,
+			totalCount,
+			page,
+			limit,
+			totalPages,
+			nextPage,
+			previousPage
+		}
+	}
