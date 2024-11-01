@@ -3,6 +3,7 @@ import {
 	Controller,
 	Delete,
 	Get,
+	HttpCode,
 	Param,
 	ParseIntPipe,
 	Patch,
@@ -35,6 +36,7 @@ export class CommentsController {
 
 	@Auth()
 	@ApiGetCommentById()
+	@HttpCode(200)
 	@Get('/:id')
 	getCommentById(@Param('id', ParseIntPipe) id: number) {
 		return this.commentsService.getCommentById(id)
@@ -42,6 +44,7 @@ export class CommentsController {
 
 	@Auth()
 	@ApiGetLikesByCommentId()
+	@HttpCode(200)
 	@Get('/:id/like')
 	getLikesByCommentId(@Param('id', ParseIntPipe) id: number) {
 		return this.commentsService.getLikesByCommentId(id)
@@ -50,6 +53,7 @@ export class CommentsController {
 	@UsePipes(new ValidationPipe())
 	@Auth()
 	@ApiCreateLikeByCommentId()
+	@HttpCode(201)
 	@Post('/:id/like')
 	createLikeByCommentId(
 		@Param('id', ParseIntPipe) commentId: number,
@@ -62,6 +66,7 @@ export class CommentsController {
 	@UsePipes(new ValidationPipe())
 	@Auth()
 	@ApiUpdateCommentById()
+	@HttpCode(200)
 	@Patch('/:id')
 	updateCommentById(
 		@Param('id', ParseIntPipe) commentId: number,
@@ -73,6 +78,7 @@ export class CommentsController {
 
 	@Auth()
 	@ApiDeleteCommentById()
+	@HttpCode(204)
 	@Delete('/:id')
 	deleteCommentById(
 		@Param('id', ParseIntPipe) commentId: number,
@@ -83,6 +89,7 @@ export class CommentsController {
 
 	@Auth()
 	@ApiDeleteLikeByCommentId()
+	@HttpCode(204)
 	@Delete('/:id/like')
 	deleteLikeByCommentId(
 		@Param('id', ParseIntPipe) commentId: number,

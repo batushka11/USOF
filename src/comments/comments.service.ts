@@ -100,7 +100,7 @@ export class CommentsService {
 		const comment = await this.findCommentOrFail(commentId)
 		if (comment.authorId !== authorId) throw new ForbiddenException()
 
-		return this.prisma.comment.delete({
+		await this.prisma.comment.delete({
 			where: { id: commentId, authorId }
 		})
 	}

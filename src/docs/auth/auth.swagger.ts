@@ -24,7 +24,10 @@ export const ApiLogin = () =>
 		}),
 		ApiResponse({
 			status: 401,
-			description: 'Invalid credentials or unconfirmed email.'
+			description: 'Invalid credentials or unconfirmed email.',
+			schema: {
+				example: { message: 'Invalid credentials' }
+			}
 		}),
 		ApiBody({
 			type: LoginDto,
@@ -47,15 +50,17 @@ export const ApiRegister = () =>
 			schema: {
 				example: {
 					message:
-						'User registered. Please check your email to confirm your account.',
-					token: 'confirmation-token'
+						'User registered. Please check your email to confirm your account.'
 				}
 			}
 		}),
 		ApiResponse({
 			status: 400,
 			description:
-				'User with this email or login already exists, or passwords do not match.'
+				'User with this email or login already exists, or passwords do not match.',
+			schema: {
+				example: { message: 'Passwords do not match' }
+			}
 		}),
 		ApiBody({
 			type: RegisterDto,
@@ -105,7 +110,10 @@ export const ApiSendResetPassword = () =>
 		}),
 		ApiResponse({
 			status: 400,
-			description: 'User not found or account not confirmed.'
+			description: 'User not found or account not confirmed.',
+			schema: {
+				example: { message: 'User not found' }
+			}
 		}),
 		ApiBody({
 			schema: { example: { email: 'user@example.com' } },
@@ -123,7 +131,13 @@ export const ApiResetPassword = () =>
 				example: { message: 'Reset password success' }
 			}
 		}),
-		ApiResponse({ status: 401, description: 'Invalid or expired token.' }),
+		ApiResponse({
+			status: 401,
+			description: 'Invalid or expired token.',
+			schema: {
+				example: { message: 'Invalid or expired token' }
+			}
+		}),
 		ApiParam({
 			name: 'token',
 			type: 'string',
@@ -159,17 +173,16 @@ export const ApiRefreshTokens = () =>
 			description: 'New access and refresh tokens generated successfully.',
 			schema: {
 				example: {
-					user: {
-						id: 1,
-						email: 'user@example.com',
-						login: 'user123'
-					},
+					user: { id: 1, email: 'user@example.com', login: 'user123' },
 					accessToken: 'new-access-token'
 				}
 			}
 		}),
 		ApiResponse({
 			status: 401,
-			description: 'Invalid or expired refresh token in cookie.'
+			description: 'Invalid or expired refresh token in cookie.',
+			schema: {
+				example: { message: 'Invalid or expired refresh token' }
+			}
 		})
 	)

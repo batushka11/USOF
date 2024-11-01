@@ -3,6 +3,7 @@ import {
 	Controller,
 	Delete,
 	Get,
+	HttpCode,
 	Param,
 	ParseIntPipe,
 	Patch,
@@ -44,18 +45,21 @@ export class CategoriesController {
 	constructor(private readonly categoriesService: CategoriesService) {}
 
 	@ApiGetAllCategories()
+	@HttpCode(200)
 	@Get()
 	async getAllCategories(@PaginationParams() paginationParams: Pagination) {
 		return this.categoriesService.getAllCategories(paginationParams)
 	}
 
 	@ApiGetCategoryById()
+	@HttpCode(200)
 	@Get('/:id')
 	async getCategoryById(@Param('id', ParseIntPipe) id: number) {
 		return this.categoriesService.getCategoryById(id)
 	}
 
 	@ApiGetPostsByCategoryId()
+	@HttpCode(200)
 	@Get('/:id/posts')
 	async getPostsByCategoryId(
 		@Param('id', ParseIntPipe) id: number,
@@ -66,6 +70,7 @@ export class CategoriesController {
 
 	@ApiCreateCategory()
 	@Roles(Role.ADMIN)
+	@HttpCode(201)
 	@UsePipes(new ValidationPipe())
 	@Post()
 	async createCategory(@Body() dto: CreateCategoryDto) {
@@ -74,6 +79,7 @@ export class CategoriesController {
 
 	@ApiUpdateCategoryById()
 	@Roles(Role.ADMIN)
+	@HttpCode(200)
 	@UsePipes(new ValidationPipe())
 	@Patch('/:id')
 	async updateCategory(
@@ -85,6 +91,7 @@ export class CategoriesController {
 
 	@ApiDeleteCategoryById()
 	@Roles(Role.ADMIN)
+	@HttpCode(204)
 	@Delete('/:id')
 	async deleteCategory(@Param('id', ParseIntPipe) id: number) {
 		return this.categoriesService.deleteCategory(id)

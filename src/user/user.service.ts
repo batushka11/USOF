@@ -105,7 +105,7 @@ export class UserService {
 				'You don`t have access to remove another user'
 			)
 
-		return this.prisma.user.delete({
+		await this.prisma.user.delete({
 			where: { id }
 		})
 	}

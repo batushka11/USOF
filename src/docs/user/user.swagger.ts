@@ -7,6 +7,7 @@ import {
 	ApiResponse
 } from '@nestjs/swagger'
 import { Role } from '@prisma/client'
+import { AvatarDto } from 'src/user/dto/avatar.dto'
 import { CreateUserDto } from 'src/user/dto/create-user.dto'
 import { UpdateUserDto } from 'src/user/dto/update-user.dto'
 
@@ -74,7 +75,11 @@ export const ApiGetUserById = () =>
 				}
 			}
 		}),
-		ApiResponse({ status: 404, description: 'User not found' })
+		ApiResponse({
+			status: 404,
+			description: 'User not found',
+			schema: { example: { message: 'User with this id doesn’t exist' } }
+		})
 	)
 
 export const ApiCreateUser = () =>
@@ -111,14 +116,19 @@ export const ApiCreateUser = () =>
 			}
 		}),
 		ApiResponse({
-			status: 409,
-			description: 'User with this email or login already exists'
+			status: 400,
+			description: 'Password mismatch or user already exists',
+			schema: { example: { message: 'Password must be the same' } }
 		})
 	)
 
 export const ApiUpdateUserAvatar = () =>
 	applyDecorators(
 		ApiOperation({ summary: 'Update user avatar' }),
+		ApiBody({
+			type: AvatarDto,
+			description: 'Data to upload user avatar'
+		}),
 		ApiResponse({
 			status: 200,
 			description: 'Avatar updated successfully',
@@ -126,7 +136,11 @@ export const ApiUpdateUserAvatar = () =>
 				example: { id: 1, avatarPath: '/avatars/user1.jpg' }
 			}
 		}),
-		ApiResponse({ status: 404, description: 'User not found' })
+		ApiResponse({
+			status: 404,
+			description: 'User not found',
+			schema: { example: { message: 'User with this id doesn’t exist' } }
+		})
 	)
 
 export const ApiUpdateUserInfo = () =>
@@ -162,8 +176,18 @@ export const ApiUpdateUserInfo = () =>
 				}
 			}
 		}),
-		ApiResponse({ status: 403, description: 'Forbidden access' }),
-		ApiResponse({ status: 404, description: 'User not found' })
+		ApiResponse({
+			status: 403,
+			description: 'Forbidden access',
+			schema: {
+				example: { message: 'You don’t have access to update another user' }
+			}
+		}),
+		ApiResponse({
+			status: 404,
+			description: 'User not found',
+			schema: { example: { message: 'User with this id doesn’t exist' } }
+		})
 	)
 
 export const ApiDeleteUser = () =>
@@ -176,6 +200,16 @@ export const ApiDeleteUser = () =>
 			description: 'User ID'
 		}),
 		ApiResponse({ status: 204, description: 'User deleted successfully' }),
-		ApiResponse({ status: 403, description: 'Forbidden access' }),
-		ApiResponse({ status: 404, description: 'User not found' })
+		ApiResponse({
+			status: 403,
+			description: 'Forbidden access',
+			schema: {
+				example: { message: 'You don’t have access to remove another user' }
+			}
+		}),
+		ApiResponse({
+			status: 404,
+			description: 'User not found',
+			schema: { example: { message: 'User with this id doesn’t exist' } }
+		})
 	)

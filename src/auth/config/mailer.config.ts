@@ -1,6 +1,9 @@
 import { MailerOptions } from '@nestjs-modules/mailer'
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter'
+import * as dotenv from 'dotenv'
 import * as path from 'path'
+
+dotenv.config()
 
 export const mailerConfig: MailerOptions = {
 	transport: {
@@ -8,8 +11,8 @@ export const mailerConfig: MailerOptions = {
 		port: 465,
 		secure: true,
 		auth: {
-			user: 'zhupanovandrey05@gmail.com',
-			pass: 'zuiy lnly scyz kxye'
+			user: process.env.EMAIL_USER,
+			pass: process.env.EMAIL_PASS
 		}
 	},
 	defaults: {

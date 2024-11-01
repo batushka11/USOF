@@ -97,6 +97,6 @@ export class CategoriesService {
 
 	async deleteCategory(id: number) {
 		await this.ensureCategoryByIdExists(id)
-		return this.prisma.category.delete({ where: { id } })
+		await this.prisma.category.delete({ where: { id } })
 	}
 }

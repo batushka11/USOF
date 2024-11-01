@@ -3,6 +3,7 @@ import {
 	Controller,
 	Delete,
 	Get,
+	HttpCode,
 	Param,
 	ParseIntPipe,
 	Patch,
@@ -49,12 +50,14 @@ export class UserController {
 	constructor(private readonly userService: UserService) {}
 
 	@ApiGetAllUsers()
+	@HttpCode(200)
 	@Get()
 	async getUsers(@PaginationParams() paginationParams: Pagination) {
 		return this.userService.getAllUsers(paginationParams)
 	}
 
 	@ApiGetUserById()
+	@HttpCode(200)
 	@Get('/:id')
 	async getUser(@Param('id', ParseIntPipe) id: number) {
 		return this.userService.getUserById(id)
@@ -63,12 +66,14 @@ export class UserController {
 	@UsePipes(new ValidationPipe())
 	@Roles(Role.ADMIN)
 	@ApiCreateUser()
+	@HttpCode(201)
 	@Post()
 	async addUser(@Body() dto: CreateUserDto) {
 		return this.userService.createUser(dto)
 	}
 
 	@ApiUpdateUserAvatar()
+	@HttpCode(200)
 	@Patch('/avatar')
 	@UseInterceptors(avatarFileInterceptor())
 	@UseFilters(new HttpExceptionFilter())
@@ -81,6 +86,7 @@ export class UserController {
 	}
 
 	@ApiUpdateUserInfo()
+	@HttpCode(200)
 	@UsePipes(new ValidationPipe())
 	@Patch('/:id')
 	async updateUserInfo(
@@ -92,6 +98,7 @@ export class UserController {
 	}
 
 	@ApiDeleteUser()
+	@HttpCode(204)
 	@Delete('/:id')
 	async deleteUser(
 		@Param('id', ParseIntPipe) id: number,

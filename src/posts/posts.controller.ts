@@ -3,6 +3,7 @@ import {
 	Controller,
 	Delete,
 	Get,
+	HttpCode,
 	Param,
 	ParseIntPipe,
 	Patch,
@@ -48,6 +49,7 @@ export class PostsController {
 	constructor(private readonly postsService: PostsService) {}
 
 	@ApiGetAllPosts()
+	@HttpCode(200)
 	@Get()
 	async getAllPosts(
 		@PaginationParams() paginationParams: Pagination,
@@ -57,6 +59,7 @@ export class PostsController {
 	}
 
 	@ApiGetPostById()
+	@HttpCode(200)
 	@Get('/:id')
 	async getPostById(
 		@Param('id', ParseIntPipe) id: number,
@@ -66,6 +69,7 @@ export class PostsController {
 	}
 
 	@ApiGetCommentsByPostId()
+	@HttpCode(200)
 	@Get('/:id/comments')
 	async getCommentsByPostId(
 		@Param('id', ParseIntPipe) id: number,
@@ -75,6 +79,7 @@ export class PostsController {
 	}
 
 	@ApiAddCommentByPostId()
+	@HttpCode(201)
 	@Post('/:id/comments')
 	async addCommentByPostId(
 		@Param('id', ParseIntPipe) idPost: number,
@@ -85,18 +90,21 @@ export class PostsController {
 	}
 
 	@ApiGetCategoriesByPostId()
+	@HttpCode(200)
 	@Get('/:id/categories')
 	async getCategoriesByPostId(@Param('id', ParseIntPipe) id: number) {
 		return this.postsService.getCategoriesByPostId(id)
 	}
 
 	@ApiGetLikesByPostId()
+	@HttpCode(200)
 	@Get('/:id/like')
 	async getLikesByPostId(@Param('id', ParseIntPipe) id: number) {
 		return this.postsService.getLikesByPostId(id)
 	}
 
 	@ApiCreatePost()
+	@HttpCode(201)
 	@UsePipes(new ValidationPipe())
 	@Post('/')
 	async createPost(@Body() dto: CreatePostDto, @CurrentUser('id') id: number) {
@@ -104,6 +112,7 @@ export class PostsController {
 	}
 
 	@ApiCreateLikeByPostId()
+	@HttpCode(201)
 	@UsePipes(new ValidationPipe())
 	@Post('/:id/like')
 	async createLikeByPostId(
@@ -115,6 +124,7 @@ export class PostsController {
 	}
 
 	@ApiUpdatePostById()
+	@HttpCode(200)
 	@UsePipes(new ValidationPipe())
 	@Patch('/:id')
 	async updatePostById(
@@ -126,6 +136,7 @@ export class PostsController {
 	}
 
 	@ApiDeletePostById()
+	@HttpCode(204)
 	@Delete('/:id')
 	async deletePostById(
 		@Param('id', ParseIntPipe) postId: number,
@@ -135,6 +146,7 @@ export class PostsController {
 	}
 
 	@ApiDeleteLikeByPostId()
+	@HttpCode(204)
 	@Delete('/:id/like')
 	async deleteLikeByPostId(
 		@Param('id', ParseIntPipe) postId: number,

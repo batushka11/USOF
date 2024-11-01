@@ -6,6 +6,8 @@ import {
 	ApiQuery,
 	ApiResponse
 } from '@nestjs/swagger'
+import { CreateCategoryDto } from 'src/categories/dto/create_category.dto'
+import { UpdateCategoryDto } from 'src/categories/dto/update_category.dto'
 
 export const ApiGetAllCategories = () =>
 	applyDecorators(
@@ -67,12 +69,24 @@ export const ApiGetCategoryById = () =>
 				}
 			}
 		}),
-		ApiResponse({ status: 404, description: 'Category not found' })
+		ApiResponse({
+			status: 404,
+			description: 'Category not found',
+			schema: {
+				example: { message: 'Category with this id doesn’t exist' }
+			}
+		})
 	)
 
 export const ApiGetPostsByCategoryId = () =>
 	applyDecorators(
 		ApiOperation({ summary: 'Get posts by category ID' }),
+		ApiParam({
+			name: 'id',
+			type: Number,
+			example: 1,
+			description: 'ID of the category'
+		}),
 		ApiResponse({
 			status: 200,
 			description: 'List of posts associated with the category.',
@@ -99,7 +113,10 @@ export const ApiGetPostsByCategoryId = () =>
 		}),
 		ApiResponse({
 			status: 404,
-			description: 'No posts associated with this category.'
+			description: 'No posts associated with this category.',
+			schema: {
+				example: { message: 'No posts associated with this category' }
+			}
 		})
 	)
 
@@ -108,12 +125,7 @@ export const ApiCreateCategory = () =>
 		ApiOperation({ summary: 'Create a new category' }),
 		ApiBody({
 			description: 'Data for the new category',
-			schema: {
-				example: {
-					title: 'Science',
-					description: 'Latest discoveries and updates in science'
-				}
-			}
+			type: CreateCategoryDto
 		}),
 		ApiResponse({
 			status: 201,
@@ -128,7 +140,10 @@ export const ApiCreateCategory = () =>
 		}),
 		ApiResponse({
 			status: 409,
-			description: 'Category with this title already exists'
+			description: 'Category with this title already exists',
+			schema: {
+				example: { message: 'Category with this title already exists' }
+			}
 		})
 	)
 
@@ -143,12 +158,7 @@ export const ApiUpdateCategoryById = () =>
 		}),
 		ApiBody({
 			description: 'Updated data for the category',
-			schema: {
-				example: {
-					title: 'Updated Science',
-					description: 'New description for science category'
-				}
-			}
+			type: UpdateCategoryDto
 		}),
 		ApiResponse({
 			status: 200,
@@ -161,10 +171,19 @@ export const ApiUpdateCategoryById = () =>
 				}
 			}
 		}),
-		ApiResponse({ status: 404, description: 'Category not found' }),
+		ApiResponse({
+			status: 404,
+			description: 'Category not found',
+			schema: {
+				example: { message: 'Category with this id doesn’t exist' }
+			}
+		}),
 		ApiResponse({
 			status: 409,
-			description: 'Category with this title already exists'
+			description: 'Category with this title already exists',
+			schema: {
+				example: { message: 'Category with this title already exists' }
+			}
 		})
 	)
 
@@ -177,6 +196,15 @@ export const ApiDeleteCategoryById = () =>
 			example: 1,
 			description: 'ID of the category'
 		}),
-		ApiResponse({ status: 204, description: 'Category deleted successfully' }),
-		ApiResponse({ status: 404, description: 'Category not found' })
+		ApiResponse({
+			status: 204,
+			description: 'Category deleted successfully'
+		}),
+		ApiResponse({
+			status: 404,
+			description: 'Category not found',
+			schema: {
+				example: { message: 'Category with this id doesn’t exist' }
+			}
+		})
 	)

@@ -14,9 +14,22 @@ export const ApiGetCommentById = () =>
 		}),
 		ApiResponse({
 			status: 200,
-			description: 'Successfully retrieved comment.'
+			description: 'Successfully retrieved comment.',
+			schema: {
+				example: {
+					id: 1,
+					content: 'This is a comment',
+					authorId: 1
+				}
+			}
 		}),
-		ApiResponse({ status: 404, description: 'Comment not found.' })
+		ApiResponse({
+			status: 404,
+			description: 'Comment not found.',
+			schema: {
+				example: { message: 'Comment with this id doesn’t exist' }
+			}
+		})
 	)
 
 export const ApiGetLikesByCommentId = () =>
@@ -32,9 +45,18 @@ export const ApiGetLikesByCommentId = () =>
 		}),
 		ApiResponse({
 			status: 200,
-			description: 'Successfully retrieved likes for the comment.'
+			description: 'Successfully retrieved likes for the comment.',
+			schema: {
+				example: [{ id: 1, commentId: 1, authorId: 2, type: 'LIKE' }]
+			}
 		}),
-		ApiResponse({ status: 404, description: 'Comment not found.' })
+		ApiResponse({
+			status: 404,
+			description: 'Comment not found.',
+			schema: {
+				example: { message: 'Comment with this id doesn’t exist' }
+			}
+		})
 	)
 
 export const ApiCreateLikeByCommentId = () =>
@@ -51,12 +73,26 @@ export const ApiCreateLikeByCommentId = () =>
 		}),
 		ApiResponse({
 			status: 200,
-			description: 'Successfully liked the comment.'
+			description: 'Successfully liked the comment.',
+			schema: {
+				example: { id: 1, commentId: 1, authorId: 2, type: 'LIKE' }
+			}
 		}),
-		ApiResponse({ status: 404, description: 'Comment not found.' }),
+		ApiResponse({
+			status: 404,
+			description: 'Comment not found.',
+			schema: {
+				example: { message: 'Comment with this id doesn’t exist' }
+			}
+		}),
 		ApiResponse({
 			status: 409,
-			description: 'User has already liked this comment.'
+			description: 'User has already liked this comment.',
+			schema: {
+				example: {
+					message: 'User has already liked this comment'
+				}
+			}
 		})
 	)
 
@@ -74,13 +110,27 @@ export const ApiUpdateCommentById = () =>
 		}),
 		ApiResponse({
 			status: 200,
-			description: 'Successfully updated the comment.'
+			description: 'Successfully updated the comment.',
+			schema: {
+				example: { id: 1, content: 'Updated comment content' }
+			}
 		}),
-		ApiResponse({ status: 404, description: 'Comment not found.' }),
+		ApiResponse({
+			status: 404,
+			description: 'Comment not found.',
+			schema: {
+				example: { message: 'Comment with this id doesn’t exist' }
+			}
+		}),
 		ApiResponse({
 			status: 403,
 			description:
-				'Forbidden: You do not have permission to update this comment.'
+				'Forbidden: You do not have permission to update this comment.',
+			schema: {
+				example: {
+					message: 'You do not have permission to update this comment'
+				}
+			}
 		})
 	)
 
@@ -97,14 +147,25 @@ export const ApiDeleteCommentById = () =>
 				'Remove a comment by its ID. Only the author can delete the comment.'
 		}),
 		ApiResponse({
-			status: 200,
+			status: 204,
 			description: 'Successfully deleted the comment.'
 		}),
-		ApiResponse({ status: 404, description: 'Comment not found.' }),
+		ApiResponse({
+			status: 404,
+			description: 'Comment not found.',
+			schema: {
+				example: { message: 'Comment with this id doesn’t exist' }
+			}
+		}),
 		ApiResponse({
 			status: 403,
 			description:
-				'Forbidden: You do not have permission to delete this comment.'
+				'Forbidden: You do not have permission to delete this comment.',
+			schema: {
+				example: {
+					message: 'You do not have permission to delete this comment'
+				}
+			}
 		})
 	)
 
@@ -121,12 +182,21 @@ export const ApiDeleteLikeByCommentId = () =>
 				'Delete a like from a comment by its ID. Only the user who liked the comment can remove their like.'
 		}),
 		ApiResponse({
-			status: 200,
+			status: 204,
 			description: 'Successfully removed like from the comment.'
 		}),
-		ApiResponse({ status: 404, description: 'Comment not found.' }),
+		ApiResponse({
+			status: 404,
+			description: 'Like not found for this comment.',
+			schema: {
+				example: { message: 'Like with this comment id doesn’t exist' }
+			}
+		}),
 		ApiResponse({
 			status: 403,
-			description: 'Forbidden: You do not have permission to remove this like.'
+			description: 'Forbidden: You do not have permission to remove this like.',
+			schema: {
+				example: { message: 'You do not have permission to remove this like' }
+			}
 		})
 	)

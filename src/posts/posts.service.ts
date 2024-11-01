@@ -90,9 +90,7 @@ export class PostsService {
 			limit,
 			totalPages,
 			nextPage,
-			previousPage,
-			hasNextPage,
-			hasPreviousPage
+			previousPage
 		}
 	}
 
@@ -214,7 +212,7 @@ export class PostsService {
 
 		if (like.authorId !== authorId) throw new ForbiddenException()
 
-		return this.prisma.like.delete({ where: { id: like.id } })
+		await this.prisma.like.delete({ where: { id: like.id } })
 	}
 
 	async updatePostById(postId: number, dto: UpdatePostDto, author: User) {
@@ -252,6 +250,6 @@ export class PostsService {
 			throw new ForbiddenException('User with this id cannot delete this post')
 		}
 
-		return this.prisma.post.delete({ where: { id: postId } })
+		await this.prisma.post.delete({ where: { id: postId } })
 	}
 }
