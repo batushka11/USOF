@@ -40,7 +40,6 @@ import {
 	ApiUpdateUserAvatar,
 	ApiUpdateUserInfo
 } from './docs/user.swagger'
-import { S3Service } from './service/s3.service'
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -48,10 +47,7 @@ import { S3Service } from './service/s3.service'
 @Controller('users')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class UserController {
-	constructor(
-		private readonly userService: UserService,
-		private readonly s3Service: S3Service
-	) {}
+	constructor(private readonly userService: UserService) {}
 
 	@ApiGetAllUsers()
 	@HttpCode(200)
@@ -85,8 +81,7 @@ export class UserController {
 		@CurrentUser('id') id: number,
 		@UploadedFile() file: Express.Multer.File
 	) {
-		const filePath = await this.s3Service.uploadFile(file)
-		return this.userService.updateUserAvatar(id, filePath)
+		return this.userService.updateUserAvatar(id, file)
 	}
 
 	@ApiUpdateUserInfo()

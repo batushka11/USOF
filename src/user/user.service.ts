@@ -7,12 +7,16 @@ import { Role, User } from '@prisma/client'
 import { hash } from 'argon2'
 import { Pagination } from 'src/pagination/pagination_params.decorator'
 import { PrismaService } from 'src/prisma/prisma.service'
+import { S3Service } from './aws_service/s3.service'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 
 @Injectable()
 export class UserService {
-	constructor(private prisma: PrismaService) {}
+	constructor(
+		private prisma: PrismaService,
+		private s3Service: S3Service
+	) {}
 
 	async getAllUsers({ page, limit, size, offset }: Pagination) {
 		const [users, totalCount] = await Promise.all([
@@ -68,14 +72,17 @@ export class UserService {
 		return user
 	}
 
-	async updateUserAvatar(id: number, path: string) {
+	async updateUserAvatar(id: number, file: Express.Multer.File) {
 		const user = await this.prisma.user.findUnique({ where: { id } })
 
 		if (!user) throw new BadRequestException('User with this id doesn`t exist')
 
+		await this.s3Service.deleteFileFromUrl(user.avatarPath)
+		const filePath = await this.s3Service.uploadFile(file)
+
 		return this.prisma.user.update({
 			where: { id },
-			data: { avatarPath: path }
+			data: { avatarPath: filePath }
 		})
 	}
 

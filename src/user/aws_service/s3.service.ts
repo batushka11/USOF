@@ -23,6 +23,22 @@ export class S3Service {
 		})
 	}
 
+	async deleteFileFromUrl(fileUrl: string): Promise<void> {
+		if (fileUrl !== this.configService.get<string>('AWS_DEFAULT_IMAGE_URL')) {
+			const bucketName = this.configService.get<string>('AWS_S3_BUCKET_NAME')
+			const region = this.configService.get<string>('AWS_REGION')
+
+			const urlPrefix = `https://${bucketName}.s3.${region}.amazonaws.com/`
+			if (!fileUrl.startsWith(urlPrefix)) {
+				throw new InternalServerErrorException('Invalid file URL')
+			}
+
+			const fileKey = decodeURIComponent(fileUrl.replace(urlPrefix, ''))
+
+			await this.deleteFile(fileKey)
+		}
+	}
+
 	async deleteFile(fileKey: string): Promise<void> {
 		const bucketName = this.configService.get<string>('AWS_S3_BUCKET_NAME')
 
@@ -60,9 +76,7 @@ export class S3Service {
 
 			await upload.done()
 
-			const filePath = `https://${bucketName}.s3.${this.configService.get<string>('AWS_REGION')}.amazonaws.com/${fileKey.replace(/ /g, '+')}`
-
-			this.logger.log(`Generated file URL: ${filePath}`)
+			const filePath = `https://${bucketName}.s3.${this.configService.get<string>('AWS_REGION')}.amazonaws.com/${encodeURIComponent(fileKey)}`
 			return filePath
 		} catch (error) {
 			this.logger.error('Error uploading file to S3:', error)
