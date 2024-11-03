@@ -3,40 +3,34 @@ import {
 	createParamDecorator,
 	ExecutionContext
 } from '@nestjs/common'
-import { Request } from 'express'
-import { ParsedQs } from 'qs'
 import { Filtering } from './filter.interface'
-import { FilterRule } from './filter.rule'
 
 export const FilteringParams = createParamDecorator(
-	(data: string[], ctx: ExecutionContext): Filtering[] => {
-		const req: Request = ctx.switchToHttp().getRequest()
-		const filters: string[] = ([] as (string | ParsedQs)[])
-			.concat(req.query.filter)
-			.filter((filter): filter is string => typeof filter === 'string')
+	(data, ctx: ExecutionContext): Filtering | null => {
+		const req = ctx.switchToHttp().getRequest()
+		const { filterBy, rule, startAt, endAt } = req.query
 
-		if (!filters || filters.length === 0) return null
+		const allowedFilters = ['date', 'categories']
 
-		return filters.map(filter => {
-			if (
-				!filter.match(
-					/^[a-zA-Z0-9_]+:(eq|neq|gt|gte|lt|lte|like|nlike|in|nin):[a-zA-Z0-9_,]+$/
-				) &&
-				!filter.match(/^[a-zA-Z0-9_]+:(isnull|isnotnull)$/)
-			) {
-				throw new BadRequestException('Invalid filter format')
-			}
+		if (filterBy && !allowedFilters.includes(filterBy)) {
+			throw new BadRequestException(
+				`Invalid filterBy value: ${filterBy}. Allowed values are ${allowedFilters.join(', ')}`
+			)
+		}
 
-			const [properties, rule, value] = filter.split(':')
+		const isValidDate = (dateStr: string) => !isNaN(Date.parse(dateStr))
+		if (startAt && !isValidDate(startAt)) {
+			throw new BadRequestException(`Invalid startAt date: ${startAt}`)
+		}
+		if (endAt && !isValidDate(endAt)) {
+			throw new BadRequestException(`Invalid endAt date: ${endAt}`)
+		}
 
-			if (!data.includes(properties)) {
-				throw new BadRequestException(`Invalid filter property: ${properties}`)
-			}
-			if (!Object.values(FilterRule).includes(rule as FilterRule)) {
-				throw new BadRequestException(`Invalid filter rule: ${rule}`)
-			}
-
-			return { properties, rule, value }
-		})
+		return {
+			filterBy: filterBy as string,
+			rule: rule ? (rule as string) : undefined,
+			startAt: startAt && isValidDate(startAt) ? startAt : undefined,
+			endAt: endAt && isValidDate(endAt) ? endAt : undefined
+		}
 	}
 )

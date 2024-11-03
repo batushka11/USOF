@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
-import { ServeStaticModule } from '@nestjs/serve-static'
-import path from 'path'
 import { AdminModule } from './admin/admin.module'
 import { AuthModule } from './auth/auth.module'
 import { CategoriesModule } from './categories/categories.module'
@@ -20,10 +18,6 @@ import { UserModule } from './user/user.module'
 		AuthModule,
 		PrismaModule,
 		UserModule,
-		ServeStaticModule.forRoot({
-			rootPath: path.join(process.cwd(), 'public', 'avatars'),
-			serveRoot: '/avatars'
-		}),
 		PostsModule,
 		CategoriesModule,
 		CommentsModule,

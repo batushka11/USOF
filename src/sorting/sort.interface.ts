@@ -1,4 +1,4 @@
 export interface Sorting {
-	property: string
-	direction: 'asc' | 'desc'
+	sortBy: string
+	order: 'asc' | 'desc'
 }

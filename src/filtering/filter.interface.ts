@@ -1,5 +1,6 @@
 export interface Filtering {
-	properties: string
-	rule: string
-	value?: string
+	filterBy: string
+	rule?: string
+	startAt?: string
+	endAt?: string
 }

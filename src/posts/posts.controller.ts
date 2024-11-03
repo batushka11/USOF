@@ -57,12 +57,16 @@ export class PostsController {
 	@Get()
 	async getAllPosts(
 		@PaginationParams() paginationParams: Pagination,
-		@SortingParams(['like', 'publishAt']) sortingParams: Sorting,
-		@FilteringParams(['category', 'startInterval', 'finishInterval', 'status'])
-		filteringParams: Filtering,
+		@SortingParams() sortingParams: Sorting,
+		@FilteringParams() filteringParams: Filtering,
 		@CurrentUser() user: User
 	) {
-		return this.postsService.getAllPosts(paginationParams, sortingParams, user)
+		return this.postsService.getAllPosts(
+			paginationParams,
+			sortingParams,
+			filteringParams,
+			user
+		)
 	}
 
 	@ApiGetPostById()

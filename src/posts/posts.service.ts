@@ -4,8 +4,9 @@ import {
 	Injectable,
 	NotFoundException
 } from '@nestjs/common'
-import { Role, Status, Type, User } from '@prisma/client'
+import { Role, Type, User } from '@prisma/client'
 import { CreateLikeDto } from 'src/comments/dto/create_like.dto'
+import { Filtering } from 'src/filtering/filter.interface'
 import { Pagination } from 'src/pagination/pagination_params.decorator'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { Sorting } from 'src/sorting/sort.interface'
@@ -26,26 +27,43 @@ export class PostsService {
 
 	async getAllPosts(
 		{ page, limit, offset }: Pagination,
-		{ property, direction }: Sorting,
+		{ sortBy, order }: Sorting,
+		{ filterBy, rule, startAt, endAt }: Filtering,
 		user: User
 	) {
-		const status = user.role === 'USER' ? Status.ACTIVE : undefined
-
 		const orderBy =
-			property === 'like'
-				? { like: { _count: direction } }
-				: { [property]: direction }
+			sortBy === 'like' ? { like: { _count: order } } : { [sortBy]: order }
+
+		const where: any = {}
+
+		if (user.role === 'USER') {
+			where.status = 'ACTIVE'
+		}
+
+		if (filterBy === 'categories' && rule) {
+			where.categories = {
+				some: {
+					category: {
+						title: rule
+					}
+				}
+			}
+		}
+
+		if (filterBy === 'date') {
+			where.publishAt = {}
+			if (startAt) where.publishAt.gte = new Date(startAt)
+			if (endAt) where.publishAt.lte = new Date(endAt)
+		}
 
 		const [posts, totalCount] = await Promise.all([
 			this.prisma.post.findMany({
-				where: { status },
+				where,
 				take: limit,
 				skip: offset,
 				orderBy
 			}),
-			this.prisma.post.count({
-				where: { status }
-			})
+			this.prisma.post.count({ where })
 		])
 
 		const totalPages = Math.ceil(totalCount / limit)
@@ -61,7 +79,10 @@ export class PostsService {
 			limit,
 			totalPages,
 			nextPage,
-			previousPage
+			previousPage,
+			filterBy,
+			sortBy,
+			order
 		}
 	}
 

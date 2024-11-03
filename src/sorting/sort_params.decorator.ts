@@ -7,22 +7,26 @@ import { Request } from 'express'
 import { Sorting } from './sort.interface'
 
 export const SortingParams = createParamDecorator(
-	(validParams: string[], ctx: ExecutionContext): Sorting | null => {
+	(data, ctx: ExecutionContext): Sorting | null => {
 		const req: Request = ctx.switchToHttp().getRequest()
-		const property = req.query.property as string
-		const direction = (req.query.direction as string) || 'desc'
-		if (!property) {
-			return { property: 'like', direction: 'desc' }
+		const sortBy = req.query.sortBy as string
+		const direction = (req.query.order as string) || 'desc'
+		if (!sortBy) {
+			return { sortBy: 'like', order: 'desc' }
 		}
 
-		if (!validParams.includes(property)) {
-			throw new BadRequestException(`Invalid sort property: ${property}`)
+		const allowedSorts = ['publishAt', 'like']
+
+		if (sortBy && !allowedSorts.includes(sortBy)) {
+			throw new BadRequestException(
+				`Invalid sortBy value: ${sortBy}. Allowed values are ${allowedSorts.join(', ')}`
+			)
 		}
 
 		if (direction !== 'asc' && direction !== 'desc') {
 			throw new BadRequestException(`Invalid sort direction: ${direction}`)
 		}
 
-		return { property, direction: direction as 'asc' | 'desc' }
+		return { sortBy, order: direction as 'asc' | 'desc' }
 	}
 )
