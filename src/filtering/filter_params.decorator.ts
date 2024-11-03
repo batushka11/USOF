@@ -10,8 +10,10 @@ export const FilteringParams = createParamDecorator(
 		const req = ctx.switchToHttp().getRequest()
 		const { filterBy, rule, startAt, endAt } = req.query
 
-		const allowedFilters = ['date', 'categories']
+		const allowedFilters = ['date', 'category']
 
+		if (!filterBy)
+			throw new BadRequestException("Don't have filter param to sort")
 		if (filterBy && !allowedFilters.includes(filterBy)) {
 			throw new BadRequestException(
 				`Invalid filterBy value: ${filterBy}. Allowed values are ${allowedFilters.join(', ')}`

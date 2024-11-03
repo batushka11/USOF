@@ -46,10 +46,33 @@ export class CommentsService {
 		})
 
 		if (existingInteraction) {
-			throw new ConflictException(
-				`User has already ${interactionType.toLowerCase()}d this comment`
-			)
+			throw new ConflictException(`User has already interact with this comment`)
 		}
+
+		await this.prisma.comment.update({
+			where: { id: commentId },
+			data: {
+				rating: {
+					increment: interactionType === Type.LIKE ? 1 : -1
+				}
+			}
+		})
+
+		const user = await this.prisma.comment.findUnique({
+			where: { id: commentId },
+			include: {
+				user: true
+			}
+		})
+
+		await this.prisma.user.update({
+			where: { id: user.authorId },
+			data: {
+				rating: {
+					increment: interactionType === Type.LIKE ? 1 : -1
+				}
+			}
+		})
 
 		return this.prisma.like.create({
 			data: { commentId, authorId, type: interactionType }
@@ -79,7 +102,32 @@ export class CommentsService {
 
 		if (like.authorId !== authorId) throw new ForbiddenException()
 
-		return this.prisma.like.delete({ where: { id: like.id } })
+		await this.prisma.like.delete({ where: { id: like.id } })
+
+		await this.prisma.comment.update({
+			where: { id: commentId },
+			data: {
+				rating: {
+					increment: like.type === Type.LIKE ? -1 : 1
+				}
+			}
+		})
+
+		const user = await this.prisma.comment.findUnique({
+			where: { id: commentId },
+			include: {
+				user: true
+			}
+		})
+
+		await this.prisma.user.update({
+			where: { id: user.authorId },
+			data: {
+				rating: {
+					increment: like.type === Type.LIKE ? -1 : 1
+				}
+			}
+		})
 	}
 
 	async updateCommentById(

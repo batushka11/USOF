@@ -12,10 +12,10 @@ export const SortingParams = createParamDecorator(
 		const sortBy = req.query.sortBy as string
 		const direction = (req.query.order as string) || 'desc'
 		if (!sortBy) {
-			return { sortBy: 'like', order: 'desc' }
+			return { sortBy: 'rating', order: 'desc' }
 		}
 
-		const allowedSorts = ['publishAt', 'like']
+		const allowedSorts = ['publishAt', 'rating']
 
 		if (sortBy && !allowedSorts.includes(sortBy)) {
 			throw new BadRequestException(

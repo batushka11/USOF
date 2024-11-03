@@ -40,6 +40,7 @@ model Post {
   authorId   Int            @map("author_id")
   like       Like[]
   comments   Comment[]
+  rating     Int            @default(0)
 }
 
 model Category {
@@ -68,6 +69,7 @@ model Comment {
   like      Like[]
   post      Post?    @relation(fields: [postId], references: [id], onDelete: SetNull)
   postId    Int?     @map("post_id")
+  rating    Int      @default(0)
 }
 
 model Like {
