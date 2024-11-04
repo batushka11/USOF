@@ -8,31 +8,32 @@ import { Filtering } from './filter.interface'
 export const FilteringParams = createParamDecorator(
 	(data, ctx: ExecutionContext): Filtering | null => {
 		const req = ctx.switchToHttp().getRequest()
-		const { filterBy, rule, startAt, endAt } = req.query
+		const { date, category, status, title } = req.query
 
-		const allowedFilters = ['date', 'category']
-
-		if (!filterBy)
-			throw new BadRequestException("Don't have filter param to sort")
-		if (filterBy && !allowedFilters.includes(filterBy)) {
-			throw new BadRequestException(
-				`Invalid filterBy value: ${filterBy}. Allowed values are ${allowedFilters.join(', ')}`
-			)
-		}
+		const start = date?.start
+		const end = date?.end
 
 		const isValidDate = (dateStr: string) => !isNaN(Date.parse(dateStr))
-		if (startAt && !isValidDate(startAt)) {
-			throw new BadRequestException(`Invalid startAt date: ${startAt}`)
+
+		if (start && !isValidDate(start)) {
+			throw new BadRequestException(`Invalid start date: ${start}`)
 		}
-		if (endAt && !isValidDate(endAt)) {
-			throw new BadRequestException(`Invalid endAt date: ${endAt}`)
+		if (end && !isValidDate(end)) {
+			throw new BadRequestException(`Invalid end date: ${end}`)
+		}
+
+		let parsedCategory: string[] | undefined
+		if (category) {
+			parsedCategory = Array.isArray(category)
+				? category
+				: category.split(',').map((c: string) => c.trim())
 		}
 
 		return {
-			filterBy: filterBy as string,
-			rule: rule ? (rule as string) : undefined,
-			startAt: startAt && isValidDate(startAt) ? startAt : undefined,
-			endAt: endAt && isValidDate(endAt) ? endAt : undefined
+			title: title ? (title as string) : undefined,
+			status: status ? (status.toUpperCase() as string) : undefined,
+			date: start || end ? { start, end } : undefined,
+			category: parsedCategory
 		}
 	}
 )

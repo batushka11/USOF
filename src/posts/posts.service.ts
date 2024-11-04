@@ -28,29 +28,40 @@ export class PostsService {
 	async getAllPosts(
 		{ page, limit, offset }: Pagination,
 		{ sortBy, order }: Sorting,
-		{ filterBy, rule, startAt, endAt }: Filtering,
+		{ date, status, title, category }: Filtering,
 		user: User
 	) {
 		const where: any = {}
 
-		if (user.role === 'USER') {
-			where.status = 'ACTIVE'
-		}
+		where.status = user.role === Role.ADMIN ? status : 'ACTIVE'
 
-		if (filterBy === 'category' && rule) {
+		if (category && category.length > 0) {
 			where.categories = {
 				some: {
 					category: {
-						title: rule
+						title: { in: category }
 					}
 				}
 			}
 		}
 
-		if (filterBy === 'date') {
-			where.publishAt = {}
-			if (startAt) where.publishAt.gte = new Date(startAt)
-			if (endAt) where.publishAt.lte = new Date(endAt)
+		if (date?.start || date?.end) {
+			where.publishAt = {
+				...(date.start && { gte: new Date(date.start) }),
+				...(date.end && { lte: new Date(date.end) })
+			}
+		}
+
+		let postIds = []
+
+		if (title) {
+			const rawTitleSearchResults = await this.prisma.$queryRaw<
+				{ id: number }[]
+			>`
+				SELECT id FROM Post WHERE LOWER(title) LIKE CONCAT('%', LOWER(${title}), '%')
+			`
+			postIds = rawTitleSearchResults.map(post => post.id)
+			where.id = { in: postIds }
 		}
 
 		const [posts, totalCount] = await Promise.all([
@@ -76,10 +87,7 @@ export class PostsService {
 			limit,
 			totalPages,
 			nextPage,
-			previousPage,
-			filterBy,
-			sortBy,
-			order
+			previousPage
 		}
 	}
 

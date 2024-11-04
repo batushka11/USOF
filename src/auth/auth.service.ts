@@ -6,6 +6,7 @@ import {
 	NotFoundException,
 	UnauthorizedException
 } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import { User } from '@prisma/client'
 import { hash, verify } from 'argon2'
@@ -20,7 +21,8 @@ export class AuthService {
 	constructor(
 		private prisma: PrismaService,
 		private jwt: JwtService,
-		private mailerService: MailerService
+		private mailerService: MailerService,
+		private readonly configService: ConfigService
 	) {}
 
 	async login(dto: LoginDto, res: Response) {
@@ -67,7 +69,8 @@ export class AuthService {
 				fullname: dto.fullname,
 				email: dto.email,
 				password: await hash(dto.password),
-				confirmToken: confirmToken
+				confirmToken: confirmToken,
+				avatarPath: this.configService.get<string>('AWS_DEFAULT_IMAGE_URL')
 			}
 		})
 

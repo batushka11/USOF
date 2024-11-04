@@ -1,6 +1,9 @@
 export interface Filtering {
-	filterBy: string
-	rule?: string
-	startAt?: string
-	endAt?: string
+	title?: string
+	status?: string
+	date?: {
+		start?: string
+		end?: string
+	}
+	category?: string[]
 }

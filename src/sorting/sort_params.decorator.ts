@@ -15,7 +15,7 @@ export const SortingParams = createParamDecorator(
 			return { sortBy: 'rating', order: 'desc' }
 		}
 
-		const allowedSorts = ['publishAt', 'rating']
+		const allowedSorts = ['publishAt', 'rating', 'title']
 
 		if (sortBy && !allowedSorts.includes(sortBy)) {
 			throw new BadRequestException(
