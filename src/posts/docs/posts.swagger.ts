@@ -11,7 +11,10 @@ import { UpdatePostDto } from 'src/posts/dto/update_post.dto'
 
 export const ApiGetAllPosts = () =>
 	applyDecorators(
-		ApiOperation({ summary: 'Get all posts with pagination' }),
+		ApiOperation({
+			summary: 'Get all posts with pagination, filtering, and sorting'
+		}),
+
 		ApiQuery({
 			name: 'page',
 			type: Number,
@@ -26,9 +29,64 @@ export const ApiGetAllPosts = () =>
 			example: 10,
 			description: 'Number of posts per page'
 		}),
+
+		ApiQuery({
+			name: 'title',
+			type: String,
+			required: false,
+			example: 'javascript',
+			description: 'Filter posts by title containing this string'
+		}),
+		ApiQuery({
+			name: 'status',
+			type: String,
+			required: false,
+			example: 'ACTIVE',
+			description: 'Filter posts by status'
+		}),
+		ApiQuery({
+			name: 'date[start]',
+			type: String,
+			required: false,
+			example: '2024-07-01',
+			description: 'Filter posts published from this start date (YYYY-MM-DD)'
+		}),
+		ApiQuery({
+			name: 'date[end]',
+			type: String,
+			required: false,
+			example: '2024-08-01',
+			description: 'Filter posts published up to this end date (YYYY-MM-DD)'
+		}),
+		ApiQuery({
+			name: 'category',
+			type: [String],
+			required: false,
+			example: ['technology', 'lifestyle'],
+			description:
+				'Filter posts by categories (comma-separated values accepted)'
+		}),
+
+		ApiQuery({
+			name: 'sortBy',
+			type: String,
+			required: false,
+			example: 'title',
+			description: 'Field to sort by (rating, title, date)'
+		}),
+		ApiQuery({
+			name: 'order',
+			type: String,
+			enum: ['asc', 'desc'],
+			required: false,
+			example: 'asc',
+			description: 'Order of sorting (asc for ascending, desc for descending)'
+		}),
+
 		ApiResponse({
 			status: 200,
-			description: 'Returns a list of posts with pagination metadata',
+			description:
+				'Returns a list of posts with pagination, filtering, and sorting metadata(default sort by rating in desc order)',
 			schema: {
 				example: {
 					posts: [
