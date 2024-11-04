@@ -1,10 +1,11 @@
 import {
+	BadRequestException,
 	ConflictException,
 	ForbiddenException,
 	Injectable,
 	NotFoundException
 } from '@nestjs/common'
-import { Role, Type, User } from '@prisma/client'
+import { Role, Status, Type, User } from '@prisma/client'
 import { CreateLikeDto } from 'src/comments/dto/create_like.dto'
 import { Filtering } from 'src/filtering/filter.interface'
 import { Pagination } from 'src/pagination/pagination_params.decorator'
@@ -109,6 +110,7 @@ export class PostsService {
 		const [comments, totalComments] = await Promise.all([
 			this.prisma.comment.findMany({
 				where: { postId: id },
+				orderBy: { rating: 'desc' },
 				take: limit,
 				skip: offset
 			}),
@@ -337,5 +339,56 @@ export class PostsService {
 		}
 
 		await this.prisma.post.delete({ where: { id: postId } })
+	}
+
+	async addPostToFavorite(postId: number, userId: number) {
+		const post = await this.findPostOrFail(postId)
+
+		if (post.status === Status.INACTIVE)
+			throw new BadRequestException('You cannot add inactive post to favorite')
+
+		const favorite = await this.prisma.postFavorite.findFirst({
+			where: { userId, postId }
+		})
+
+		if (favorite) {
+			throw new ConflictException('User has already add this post to favorite')
+		}
+
+		await this.prisma.postFavorite.create({
+			data: { postId, userId }
+		})
+
+		return this.prisma.postFavorite.findFirst({
+			where: {
+				userId,
+				postId
+			},
+			include: {
+				post: true
+			}
+		})
+	}
+
+	async deletePostFromFavorite(postId: number, userId: number) {
+		await this.findPostOrFail(postId)
+
+		const favorite = await this.prisma.postFavorite.findFirst({
+			where: {
+				userId,
+				postId
+			}
+		})
+
+		if (!favorite)
+			throw new NotFoundException('User doesn’t has this post in favorite')
+
+		if (favorite.userId !== userId) throw new ForbiddenException()
+
+		await this.prisma.postFavorite.delete({
+			where: {
+				postId_userId: { postId, userId }
+			}
+		})
 	}
 }

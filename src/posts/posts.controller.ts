@@ -32,10 +32,12 @@ import { Sorting } from 'src/sorting/sort.interface'
 import { SortingParams } from 'src/sorting/sort_params.decorator'
 import {
 	ApiAddCommentByPostId,
+	ApiAddPostToFavorite,
 	ApiCreateLikeByPostId,
 	ApiCreatePost,
 	ApiDeleteLikeByPostId,
 	ApiDeletePostById,
+	ApiDeletePostFromFavorite,
 	ApiGetAllPosts,
 	ApiGetCategoriesByPostId,
 	ApiGetCommentsByPostId,
@@ -164,5 +166,25 @@ export class PostsController {
 		@CurrentUser('id') userId: number
 	) {
 		return this.postsService.deleteLikeByPostId(postId, userId)
+	}
+
+	@ApiAddPostToFavorite()
+	@HttpCode(201)
+	@Post('/:id/favorite')
+	async addPostToFavorite(
+		@Param('id', ParseIntPipe) postId: number,
+		@CurrentUser('id') userId: number
+	) {
+		return this.postsService.addPostToFavorite(postId, userId)
+	}
+
+	@ApiDeletePostFromFavorite()
+	@HttpCode(204)
+	@Delete('/:id/favorite')
+	async deletePostFromFavorite(
+		@Param('id', ParseIntPipe) postId: number,
+		@CurrentUser('id') userId: number
+	) {
+		return this.postsService.deletePostFromFavorite(postId, userId)
 	}
 }

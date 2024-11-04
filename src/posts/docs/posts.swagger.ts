@@ -150,7 +150,8 @@ export const ApiGetPostById = () =>
 export const ApiGetCommentsByPostId = () =>
 	applyDecorators(
 		ApiOperation({
-			summary: 'Get comments for a specific post with pagination'
+			summary:
+				'Get comments for a specific post with pagination and sort by rating desc'
 		}),
 		ApiParam({
 			name: 'id',
@@ -421,6 +422,76 @@ export const ApiDeleteLikeByPostId = () =>
 			description: 'Like not found for this post',
 			schema: {
 				example: { message: 'Like with this post ID does not exist' }
+			}
+		})
+	)
+export const ApiAddPostToFavorite = () =>
+	applyDecorators(
+		ApiOperation({ summary: 'Add a post to user’s favorite list' }),
+		ApiParam({
+			name: 'id',
+			type: Number,
+			example: 1,
+			description: 'ID of the post to add to favorites'
+		}),
+		ApiResponse({
+			status: 201,
+			description: 'Successfully added post to favorites',
+			schema: {
+				example: {
+					id: 1,
+					userId: 1,
+					postId: 1,
+					post: {
+						id: 1,
+						title: 'Sample Post',
+						content: 'Post content here'
+					}
+				}
+			}
+		}),
+		ApiResponse({
+			status: 400,
+			description: 'Cannot add inactive post to favorite',
+			schema: {
+				example: { message: 'You cannot add inactive post to favorite' }
+			}
+		}),
+		ApiResponse({
+			status: 409,
+			description: 'Post already in user’s favorite list',
+			schema: {
+				example: { message: 'User has already added this post to favorite' }
+			}
+		})
+	)
+
+export const ApiDeletePostFromFavorite = () =>
+	applyDecorators(
+		ApiOperation({ summary: 'Remove a post from user’s favorite list' }),
+		ApiParam({
+			name: 'id',
+			type: Number,
+			example: 1,
+			description: 'ID of the post to remove from favorites'
+		}),
+		ApiResponse({
+			status: 204,
+			description: 'Successfully removed post from favorites'
+		}),
+		ApiResponse({
+			status: 404,
+			description: 'Post not found in user’s favorite list',
+			schema: {
+				example: { message: 'User doesn’t have this post in favorite' }
+			}
+		}),
+		ApiResponse({
+			status: 403,
+			description:
+				'User does not have permission to remove this post from favorites',
+			schema: {
+				example: { message: 'Forbidden' }
 			}
 		})
 	)

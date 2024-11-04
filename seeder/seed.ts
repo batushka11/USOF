@@ -10,7 +10,7 @@ const prisma = new PrismaClient()
 async function createAdmin(): Promise<User> {
 	return prisma.user.create({
 		data: {
-			login: 'batushka_admin',
+			login: 'admin',
 			password: await hash('12345678'),
 			fullname: 'Andrii Zhupanov',
 			email: 'zhupanovandrey05@gmail.com',

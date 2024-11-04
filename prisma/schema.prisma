@@ -8,20 +8,21 @@ datasource db {
 }
 
 model User {
-  id           Int       @id @default(autoincrement())
-  login        String    @unique
+  id           Int            @id @default(autoincrement())
+  login        String         @unique
   password     String
   fullname     String
-  email        String    @unique
-  avatarPath   String    @default("default_avatar.png") @map("avatar_path")
-  role         Role      @default(USER)
+  email        String         @unique
+  avatarPath   String         @default("default_avatar.png") @map("avatar_path")
+  role         Role           @default(USER)
   post         Post[]
   comment      Comment[]
   like         Like[]
-  rating       Int       @default(0)
-  isConfirm    Boolean   @default(false) @map("is_confirm")
-  confirmToken String?   @unique @map("confirm_token")
-  createdAt    DateTime  @default(now()) @map("created_at")
+  rating       Int            @default(0)
+  isConfirm    Boolean        @default(false) @map("is_confirm")
+  confirmToken String?        @unique @map("confirm_token")
+  createdAt    DateTime       @default(now()) @map("created_at")
+  PostFavorite PostFavorite[]
 }
 
 enum Role {
@@ -30,17 +31,18 @@ enum Role {
 }
 
 model Post {
-  id         Int            @id @default(autoincrement())
-  publishAt  DateTime       @default(now()) @map("publish_at")
-  status     Status
-  content    String         @db.Text
-  title      String         @db.Text
-  categories PostCategory[]
-  user       User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId   Int            @map("author_id")
-  like       Like[]
-  comments   Comment[]
-  rating     Int            @default(0)
+  id           Int            @id @default(autoincrement())
+  publishAt    DateTime       @default(now()) @map("publish_at")
+  status       Status
+  content      String         @db.Text
+  title        String         @db.Text
+  categories   PostCategory[]
+  user         User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId     Int            @map("author_id")
+  like         Like[]
+  comments     Comment[]
+  rating       Int            @default(0)
+  PostFavorite PostFavorite[]
 }
 
 model Category {
@@ -95,4 +97,14 @@ enum Type {
 enum Status {
   ACTIVE
   INACTIVE
+}
+
+model PostFavorite {
+  postId Int      @map("post_id")
+  userId Int      @map("user_id")
+  post   Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  addAt  DateTime @default(now()) @map("created_at")
+
+  @@id([postId, userId])
 }

@@ -1,7 +1,8 @@
 import {
 	BadRequestException,
 	ForbiddenException,
-	Injectable
+	Injectable,
+	NotFoundException
 } from '@nestjs/common'
 import { Role, User } from '@prisma/client'
 import { hash } from 'argon2'
@@ -136,6 +137,38 @@ export class UserService {
 
 			if (userByLogin)
 				throw new BadRequestException('User with this login already exists')
+		}
+	}
+
+	async getFavoritePost(userId: number, { page, limit, offset }: Pagination) {
+		const [posts, totalCount] = await Promise.all([
+			this.prisma.postFavorite.findMany({
+				where: { userId },
+				take: limit,
+				skip: offset,
+				orderBy: { addAt: 'desc' },
+				include: { post: true }
+			}),
+			this.prisma.postFavorite.count({ where: { userId } })
+		])
+
+		if (posts.length < 1)
+			throw new NotFoundException('User does not have any favorite posts')
+
+		const totalPages = Math.ceil(totalCount / limit)
+		const hasNextPage = page < totalPages
+		const hasPreviousPage = page > 1
+		const nextPage = hasNextPage ? page + 1 : null
+		const previousPage = hasPreviousPage ? page - 1 : null
+
+		return {
+			posts,
+			totalCount,
+			page,
+			limit,
+			totalPages,
+			nextPage,
+			previousPage
 		}
 	}
 }

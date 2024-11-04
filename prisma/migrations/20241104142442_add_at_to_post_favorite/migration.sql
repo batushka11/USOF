@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `PostFavorite` ADD COLUMN `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);
