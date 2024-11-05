@@ -4,7 +4,7 @@
 
 # Speak About It
 
-Speak About It is a question-and-answer platform designed for both professional and enthusiast programmers. Inspired by the collaborative environment of forums like Stack Overflow, **Speak About It** allows users to share their challenges and solutions through short posts, receive community feedback, and build a reputation based on their contributions. This project, developed with **NestJS**, **Prisma**, **MySQL**, and **Node.js**, is an API-driven solution aimed at fostering knowledge-sharing and community engagement.
+Speak About It is a question-and-answer platform designed for both professional and enthusiast programmers. Inspired by the collaborative environment of forums like Stack Overflow, **Speak About It** allows users to share their challenges and solutions through short posts, receive community feedback, and build a reputation based on their contributions. This project, developed with **NestJS**, **Prisma**, **MySQL**, **Node.js** and **AWS**, is an API-driven solution aimed at fostering knowledge-sharing and community engagement.
 
 ## Table of Contents
 
@@ -25,6 +25,12 @@ Speak About It is a question-and-answer platform designed for both professional 
 - **User Registration and Authentication**: Secure user registration and login system.
 - **Post Creation and Interaction**: Users can create posts, comment, and interact with others’ posts.
 - **Categories**: Organize posts by categories and tags for easy filtering and searching.
+- **Sorting and Filtering of Posts**: Flexible sorting and filtering options to help users find relevant posts.
+- **Favorites**: Users can mark posts as favorites for quick access later.
+- **Email Notifications via Gmail**: Notifications are sent to users' Gmail accounts when there are updates to subscribed posts.
+- **Avatar Storage in AWS**: User avatars are securely stored in AWS for reliable access and storage.
+- **User Status (Online/Offline)**: Users have a visible status indicator to show if they are online or offline.
+- **User Roles (User and Admin)**: Role-based access control, with separate permissions for regular users and admins.
 - **Subscription System**: Users can subscribe to posts and receive email notifications upon updates.
 - **Admin Panel**: Access administrative tools to manage users, posts, and other site configurations.
 
@@ -44,13 +50,13 @@ Ensure you have the following installed:
 1. **Clone the repository**:
 
    ```bash
-   git clone https://github.com/yourusername/speak-about-it.git
+   git clone https://github.com/batushka11/USOF.git
    ```
 
 2. **Navigate to the Project Folder**:
 
    ```bash
-   cd speak-about-it
+   cd USOF
    ```
 
 3. **Set Up Environment Variables**: An .env.example file is provided with all the required environment variables. Create a .env file by copying .env.example and then fill in the necessary values.
