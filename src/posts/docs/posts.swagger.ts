@@ -226,7 +226,9 @@ export const ApiGetLikesByPostId = () =>
 
 export const ApiAddCommentByPostId = () =>
 	applyDecorators(
-		ApiOperation({ summary: 'Add a comment to a specific post' }),
+		ApiOperation({
+			summary: 'Add a comment to a specific post, send email to subscribers'
+		}),
 		ApiParam({
 			name: 'id',
 			type: Number,
@@ -337,7 +339,9 @@ export const ApiCreateLikeByPostId = () =>
 
 export const ApiUpdatePostById = () =>
 	applyDecorators(
-		ApiOperation({ summary: 'Update a specific post' }),
+		ApiOperation({
+			summary: 'Update a specific post, send email to subscribers'
+		}),
 		ApiParam({
 			name: 'id',
 			type: Number,
