@@ -1,2 +1,0 @@
-[] - add checks in user service
-[] - add file to save ava in user service
