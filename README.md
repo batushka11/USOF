@@ -146,4 +146,4 @@ Also you can see documentation using URL:
 
 ## License
 
-This project is licensed under the MIT License. See the full license text below.
+This project is licensed under the MIT License. See the [LICENSE](./License.md) file for more details.
