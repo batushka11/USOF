@@ -66,6 +66,7 @@ Ensure you have the following installed:
 
 - **Node.js**: [Download and install Node.js](https://nodejs.org/)
 - **MySQL**: [Download and install MySQL](https://www.mysql.com/)
+- **NPM**: [Download and install NPM](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
 
 ### Installation
 
@@ -150,7 +151,7 @@ By default, the app will be available at http://localhost:4200
 
 For detailed information on API endpoints, request parameters, and usage examples, visit the API documentation site:
 
-- [Documentation Site](https://app.swaggerhub.com/apis/switcha236/SpeakAboutIt/1.0.0#/info)
+- [SwaggerHub](https://app.swaggerhub.com/apis/switcha236/SpeakAboutIt/1.0.0#/info)
 
 This site provides comprehensive information to help you integrate and test various parts of the API.
 Also you can see documentation using URL:
