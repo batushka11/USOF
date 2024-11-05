@@ -115,7 +115,7 @@ Ensure you have the following installed:
 8. **Seed the Database**: Populate the database with initial data by running:
 
    ```bash
-   npx run seed
+   npm run seed
    ```
 
 ---
