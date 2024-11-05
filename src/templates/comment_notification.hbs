@@ -1,0 +1,43 @@
+<html lang='en'>
+	<head>
+		<meta charset='UTF-8' />
+		<meta name='viewport' content='width=device-width, initial-scale=1.0' />
+		<title>New Comment Notification</title>
+		<style>
+			body { font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0;
+			background-color: #f5f5f5; display: flex; justify-content: center; }
+			.container { width: 100%; max-width: 600px; background-color: #fff;
+			border: 1px solid #ddd; padding: 20px; margin: 40px; border-radius: 8px; }
+			.header { font-size: 24px; font-weight: bold; margin-bottom: 10px;
+			text-align: center; color: #2c3e50; } .greeting { font-size: 18px;
+			margin-bottom: 15px; } .content { font-size: 16px; line-height: 1.6;
+			color: #4a4a4a; margin-bottom: 20px; } .btn { display: inline-block;
+			padding: 10px 15px; background-color: #2c3e50; color: #fff;
+			text-decoration: none; border-radius: 5px; text-align: center;
+			font-weight: bold; margin: 20px auto; display: block; } .footer {
+			font-size: 14px; color: #888; text-align: center; margin-top: 30px; }
+		</style>
+	</head>
+	<body>
+		<div class='container'>
+			<div class='header'>Speak About It</div>
+			<p class='greeting'>Hello, {{login}}!</p>
+			<p class='content'>
+				There’s a new comment on a post you’re following:
+			</p>
+			<p class='content'>
+				<strong>Post Title:</strong>
+				{{title}}
+			</p>
+			<p class='content'>
+				<strong>Comment:</strong>
+				{{commentContent}}
+			</p>
+			<a href='{{url}}' class='btn'>View Comment</a>
+			<div class='footer'>
+				<p>Thank you for being a part of Speak About It.</p>
+				<p>We hope this update is valuable to you!</p>
+			</div>
+		</div>
+	</body>
+</html>

@@ -171,4 +171,36 @@ export class UserService {
 			previousPage
 		}
 	}
+
+	async getSubscribePost(userId: number, { page, limit, offset }: Pagination) {
+		const [posts, totalCount] = await Promise.all([
+			this.prisma.postSubscribe.findMany({
+				where: { userId },
+				take: limit,
+				skip: offset,
+				orderBy: { addAt: 'desc' },
+				include: { post: true }
+			}),
+			this.prisma.postSubscribe.count({ where: { userId } })
+		])
+
+		if (posts.length < 1)
+			throw new NotFoundException('User does not have any subscribe posts')
+
+		const totalPages = Math.ceil(totalCount / limit)
+		const hasNextPage = page < totalPages
+		const hasPreviousPage = page > 1
+		const nextPage = hasNextPage ? page + 1 : null
+		const previousPage = hasPreviousPage ? page - 1 : null
+
+		return {
+			posts,
+			totalCount,
+			page,
+			limit,
+			totalPages,
+			nextPage,
+			previousPage
+		}
+	}
 }

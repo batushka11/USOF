@@ -33,11 +33,13 @@ import { SortingParams } from 'src/sorting/sort_params.decorator'
 import {
 	ApiAddCommentByPostId,
 	ApiAddPostToFavorite,
+	ApiAddPostToSubscribe,
 	ApiCreateLikeByPostId,
 	ApiCreatePost,
 	ApiDeleteLikeByPostId,
 	ApiDeletePostById,
 	ApiDeletePostFromFavorite,
+	ApiDeletePostFromSubscribe,
 	ApiGetAllPosts,
 	ApiGetCategoriesByPostId,
 	ApiGetCommentsByPostId,
@@ -96,10 +98,10 @@ export class PostsController {
 	@Post('/:id/comments')
 	async addCommentByPostId(
 		@Param('id', ParseIntPipe) idPost: number,
-		@Body() content: string,
+		@Body() body: { content: string },
 		@CurrentUser('id') idAuthor: number
 	) {
-		return this.postsService.addCommentByPostId(idPost, content, idAuthor)
+		return this.postsService.addCommentByPostId(idPost, body, idAuthor)
 	}
 
 	@ApiGetCategoriesByPostId()
@@ -186,5 +188,25 @@ export class PostsController {
 		@CurrentUser('id') userId: number
 	) {
 		return this.postsService.deletePostFromFavorite(postId, userId)
+	}
+
+	@ApiAddPostToSubscribe()
+	@HttpCode(201)
+	@Post('/:id/subscribe')
+	async addPostToSubscribe(
+		@Param('id', ParseIntPipe) postId: number,
+		@CurrentUser('id') userId: number
+	) {
+		return this.postsService.addPostToSubscribe(postId, userId)
+	}
+
+	@ApiDeletePostFromSubscribe()
+	@HttpCode(204)
+	@Delete('/:id/subscribe')
+	async deletePostFromSubscribe(
+		@Param('id', ParseIntPipe) postId: number,
+		@CurrentUser('id') userId: number
+	) {
+		return this.postsService.deletePostFromSubscribe(postId, userId)
 	}
 }

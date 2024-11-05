@@ -495,3 +495,73 @@ export const ApiDeletePostFromFavorite = () =>
 			}
 		})
 	)
+export const ApiAddPostToSubscribe = () =>
+	applyDecorators(
+		ApiOperation({ summary: 'Add a post to user’s subscribe list' }),
+		ApiParam({
+			name: 'id',
+			type: Number,
+			example: 1,
+			description: 'ID of the post to add to subscribe'
+		}),
+		ApiResponse({
+			status: 201,
+			description: 'Successfully added post to subscribe',
+			schema: {
+				example: {
+					id: 1,
+					userId: 1,
+					postId: 1,
+					post: {
+						id: 1,
+						title: 'Sample Post',
+						content: 'Post content here'
+					}
+				}
+			}
+		}),
+		ApiResponse({
+			status: 400,
+			description: 'Cannot add inactive post to subscribe',
+			schema: {
+				example: { message: 'You cannot add inactive post to subscribe' }
+			}
+		}),
+		ApiResponse({
+			status: 409,
+			description: 'Post already in user’s subscribe list',
+			schema: {
+				example: { message: 'User has already added this post to subscribe' }
+			}
+		})
+	)
+
+export const ApiDeletePostFromSubscribe = () =>
+	applyDecorators(
+		ApiOperation({ summary: 'Remove a post from user’s subscribe list' }),
+		ApiParam({
+			name: 'id',
+			type: Number,
+			example: 1,
+			description: 'ID of the post to remove from subscribe'
+		}),
+		ApiResponse({
+			status: 204,
+			description: 'Successfully removed post from subscribe'
+		}),
+		ApiResponse({
+			status: 404,
+			description: 'Post not found in user’s subscribe list',
+			schema: {
+				example: { message: 'User doesn’t have this post in subscribe' }
+			}
+		}),
+		ApiResponse({
+			status: 403,
+			description:
+				'User does not have permission to remove this post from subscribe',
+			schema: {
+				example: { message: 'Forbidden' }
+			}
+		})
+	)

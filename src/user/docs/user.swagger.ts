@@ -291,3 +291,62 @@ export const ApiGetFavoritePosts = () =>
 			}
 		})
 	)
+
+export const ApiGetSubscribePosts = () =>
+	applyDecorators(
+		ApiOperation({
+			summary:
+				'Get subscribe posts for the user with pagination and default sort by date'
+		}),
+		ApiQuery({
+			name: 'page',
+			type: Number,
+			required: false,
+			example: 1,
+			description: 'Current page number'
+		}),
+		ApiQuery({
+			name: 'limit',
+			type: Number,
+			required: false,
+			example: 10,
+			description: 'Number of posts per page'
+		}),
+		ApiResponse({
+			status: 200,
+			description: 'Returns a paginated list of subscribe posts for the user',
+			schema: {
+				example: {
+					posts: [
+						{
+							postId: 1,
+							userId: 1,
+							addAt: '2024-11-04T15:02:51.263Z',
+							post: {
+								id: 1,
+								publishAt: '2024-05-17T00:14:07.167Z',
+								status: 'ACTIVE',
+								content: 'Content of the post',
+								title: 'Title of the post',
+								authorId: 14,
+								rating: 0
+							}
+						}
+					],
+					totalCount: 1,
+					page: 1,
+					limit: 10,
+					totalPages: 1,
+					nextPage: null,
+					previousPage: null
+				}
+			}
+		}),
+		ApiResponse({
+			status: 404,
+			description: 'User or posts not found',
+			schema: {
+				example: { message: 'User does not have any subscribe posts' }
+			}
+		})
+	)

@@ -1,3 +1,4 @@
+import { MailerService } from '@nestjs-modules/mailer'
 import {
 	BadRequestException,
 	ConflictException,
@@ -16,7 +17,10 @@ import { UpdatePostDto } from './dto/update_post.dto'
 
 @Injectable()
 export class PostsService {
-	constructor(private prisma: PrismaService) {}
+	constructor(
+		private prisma: PrismaService,
+		private mailerService: MailerService
+	) {}
 
 	private async findPostOrFail(postId: number) {
 		const post = await this.prisma.post.findUnique({ where: { id: postId } })
@@ -134,11 +138,37 @@ export class PostsService {
 		}
 	}
 
-	async addCommentByPostId(postId: number, content: string, authorId: number) {
-		await this.findPostOrFail(postId)
-		return this.prisma.comment.create({
-			data: { content, postId, authorId }
+	async addCommentByPostId(
+		postId: number,
+		commentData: { content: string },
+		authorId: number
+	) {
+		const post = await this.findPostOrFail(postId)
+
+		const newComment = await this.prisma.comment.create({
+			data: { content: commentData.content, postId, authorId }
 		})
+
+		const subscribers = await this.prisma.postSubscribe.findMany({
+			where: { postId },
+			include: { user: true }
+		})
+
+		for (const subscriber of subscribers) {
+			await this.mailerService.sendMail({
+				to: subscriber.user.email,
+				subject: `New Comment on Post: "${post.title}"`,
+				template: 'comment_notification.hbs',
+				context: {
+					login: subscriber.user.login,
+					title: post.title,
+					commentContent: commentData.content,
+					url: `http://localhost:4200/api/posts/${postId}`
+				}
+			})
+		}
+
+		return newComment
 	}
 
 	async getCategoriesByPostId(id: number) {
@@ -310,25 +340,49 @@ export class PostsService {
 			throw new ForbiddenException('User with this id cannot update this post')
 		}
 
-		const categoryIds = await this.handleCategories(dto.categories)
+		let categoryUpdate = {}
+		if (dto.categories) {
+			const categoryIds = await this.handleCategories(dto.categories)
+			categoryUpdate = {
+				deleteMany: {},
+				create: categoryIds.map(category => ({
+					category: { connect: { id: category.id } }
+				}))
+			}
+		}
 
-		return this.prisma.post.update({
+		const updatedPost = await this.prisma.post.update({
 			where: { id: postId },
 			data: {
 				title: dto.title,
 				content: dto.content,
 				status: dto.status ?? post.status,
-				categories: {
-					deleteMany: {},
-					create: categoryIds.map(category => ({
-						category: { connect: { id: category.id } }
-					}))
-				}
+				...(dto.categories && { categories: categoryUpdate })
 			},
 			include: {
 				categories: { select: { category: true } }
 			}
 		})
+
+		const subscribers = await this.prisma.postSubscribe.findMany({
+			where: { postId },
+			include: { user: true }
+		})
+
+		for (const subscriber of subscribers) {
+			await this.mailerService.sendMail({
+				to: subscriber.user.email,
+				subject: `Post Updated: ${updatedPost.title}`,
+				template: 'post_update.hbs',
+				context: {
+					name: subscriber.user.login,
+					title: updatedPost.title,
+					url: `http://localhost:4200/api/posts/${postId}`
+				}
+			})
+		}
+
+		return updatedPost
 	}
 
 	async deletePostById(postId: number, user: User) {
@@ -386,6 +440,57 @@ export class PostsService {
 		if (favorite.userId !== userId) throw new ForbiddenException()
 
 		await this.prisma.postFavorite.delete({
+			where: {
+				postId_userId: { postId, userId }
+			}
+		})
+	}
+
+	async addPostToSubscribe(postId: number, userId: number) {
+		const post = await this.findPostOrFail(postId)
+
+		if (post.status === Status.INACTIVE)
+			throw new BadRequestException('You cannot add inactive post to subscribe')
+
+		const subscribe = await this.prisma.postSubscribe.findFirst({
+			where: { userId, postId }
+		})
+
+		if (subscribe) {
+			throw new ConflictException('User has already add this post to subscribe')
+		}
+
+		await this.prisma.postSubscribe.create({
+			data: { postId, userId }
+		})
+
+		return this.prisma.postSubscribe.findFirst({
+			where: {
+				userId,
+				postId
+			},
+			include: {
+				post: true
+			}
+		})
+	}
+
+	async deletePostFromSubscribe(postId: number, userId: number) {
+		await this.findPostOrFail(postId)
+
+		const subscribe = await this.prisma.postSubscribe.findFirst({
+			where: {
+				userId,
+				postId
+			}
+		})
+
+		if (!subscribe)
+			throw new NotFoundException('User doesn’t has this post in subscribe')
+
+		if (subscribe.userId !== userId) throw new ForbiddenException()
+
+		await this.prisma.postSubscribe.delete({
 			where: {
 				postId_userId: { postId, userId }
 			}

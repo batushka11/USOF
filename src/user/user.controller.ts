@@ -37,6 +37,7 @@ import {
 	ApiDeleteUser,
 	ApiGetAllUsers,
 	ApiGetFavoritePosts,
+	ApiGetSubscribePosts,
 	ApiGetUserById,
 	ApiUpdateUserAvatar,
 	ApiUpdateUserInfo
@@ -49,6 +50,16 @@ import {
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class UserController {
 	constructor(private readonly userService: UserService) {}
+
+	@ApiGetSubscribePosts()
+	@HttpCode(200)
+	@Get('/subscribe')
+	async getSubscribePost(
+		@CurrentUser('id') id: number,
+		@PaginationParams() paginationParams: Pagination
+	) {
+		return this.userService.getSubscribePost(id, paginationParams)
+	}
 
 	@ApiGetFavoritePosts()
 	@HttpCode(200)
