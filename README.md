@@ -128,7 +128,7 @@ By default, the app will be available at http://localhost:4200
 
 For detailed information on API endpoints, request parameters, and usage examples, visit the API documentation site:
 
-- [Documentation Site]()
+- [Documentation Site](https://app.swaggerhub.com/apis/switcha236/SpeakAboutIt/1.0.0#/info)
 
 This site provides comprehensive information to help you integrate and test various parts of the API.
 Also you can see documentation using URL:
