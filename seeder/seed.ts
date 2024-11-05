@@ -12,8 +12,8 @@ async function createAdmin(): Promise<User> {
 		data: {
 			login: 'admin',
 			password: await hash('12345678'),
-			fullname: 'Andrii Zhupanov',
-			email: 'zhupanovandrey05@gmail.com',
+			fullname: 'Admin Admin',
+			email: 'admin@example.com',
 			avatarPath: process.env.AWS_DEFAULT_IMAGE_URL || 'default_avatar.png',
 			role: 'ADMIN',
 			rating: 0,
