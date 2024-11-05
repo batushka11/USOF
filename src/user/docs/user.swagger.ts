@@ -36,10 +36,18 @@ export const ApiGetAllUsers = () =>
 					users: [
 						{
 							id: 1,
-							login: 'user1',
+							login: 'johndoe',
 							fullname: 'John Doe',
-							email: 'john@example.com',
-							role: 'USER'
+							email: 'johndoe@example.com',
+							avatarPath:
+								'https://speakaboutit.s3.eu-north-1.amazonaws.com/default_avatar.png',
+							role: 'ADMIN',
+							rating: 0,
+							isConfirm: true,
+							confirmToken: null,
+							createdAt: '2024-11-04T13:43:44.104Z',
+							lastLogout: '2024-11-05T00:55:17.943Z',
+							lastActive: '2024-11-05T01:02:47.133Z'
 						}
 					],
 					totalCount: 100,
@@ -68,10 +76,18 @@ export const ApiGetUserById = () =>
 			schema: {
 				example: {
 					id: 1,
-					login: 'user1',
+					login: 'johndoe',
 					fullname: 'John Doe',
-					email: 'john@example.com',
-					role: 'USER'
+					email: 'johndoe@example.com',
+					avatarPath:
+						'https://speakaboutit.s3.eu-north-1.amazonaws.com/default_avatar.png',
+					role: 'ADMIN',
+					rating: 0,
+					isConfirm: true,
+					confirmToken: null,
+					createdAt: '2024-11-04T13:43:44.104Z',
+					lastLogout: '2024-11-05T00:55:17.943Z',
+					lastActive: '2024-11-05T01:02:47.133Z'
 				}
 			}
 		}),

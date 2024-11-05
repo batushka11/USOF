@@ -12,13 +12,15 @@ import {
 	UsePipes,
 	ValidationPipe
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { Request, Response } from 'express'
 import { AuthService } from './auth.service'
 import { LoginDto } from './dto/login.dto'
 import { RegisterDto } from './dto/register.dto'
 import { JwtRefreshGuard } from './guards/auth.guard'
 
+import { Auth } from './decorators/auth.decorator'
+import { CurrentUser } from './decorators/user.decorator'
 import {
 	ApiConfirmEmail,
 	ApiLogin,
@@ -77,12 +79,14 @@ export class AuthController {
 		return this.authService.resetPassword(token, body.password)
 	}
 
+	@ApiBearerAuth()
+	@Auth()
 	@UsePipes(new ValidationPipe())
 	@HttpCode(200)
 	@ApiLogout()
 	@Post('logout')
-	async logout(@Res() res: Response) {
-		return this.authService.logout(res)
+	async logout(@Res() res: Response, @CurrentUser('id') id: number) {
+		return this.authService.logout(res, id)
 	}
 
 	@UsePipes(new ValidationPipe())

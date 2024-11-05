@@ -21,11 +21,11 @@ export class UserService {
 
 	async getAllUsers({ page, limit, size, offset }: Pagination) {
 		const [users, totalCount] = await Promise.all([
-			this.prisma.post.findMany({
+			this.prisma.user.findMany({
 				take: limit,
 				skip: offset
 			}),
-			this.prisma.post.count()
+			this.prisma.user.count()
 		])
 
 		const totalPages = Math.ceil(totalCount / limit)

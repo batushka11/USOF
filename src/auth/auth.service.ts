@@ -29,6 +29,10 @@ export class AuthService {
 		const user = await this.validateUser(dto)
 		const tokens = await this.tokens(user.id)
 
+		await this.prisma.user.update({
+			where: { id: user.id },
+			data: { lastActive: new Date() }
+		})
 		res.cookie('refreshToken', tokens.refreshToken, {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === 'production',
@@ -77,8 +81,7 @@ export class AuthService {
 		await this.sendConfirmationEmail(user.email, user.confirmToken, user.login)
 		return {
 			message:
-				'User registered. Please check your email to confirm your account.',
-			token: confirmToken
+				'User registered. Please check your email to confirm your account.'
 		}
 	}
 
@@ -206,7 +209,13 @@ export class AuthService {
 		}
 	}
 
-	async logout(res: Response) {
+	async logout(res: Response, id: number) {
+		await this.prisma.user.update({
+			where: { id },
+			data: {
+				lastLogout: new Date()
+			}
+		})
 		res.clearCookie('refreshToken')
 		res.send({ message: 'Logged out successfully' })
 	}

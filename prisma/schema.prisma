@@ -23,6 +23,8 @@ model User {
   confirmToken String?        @unique @map("confirm_token")
   createdAt    DateTime       @default(now()) @map("created_at")
   PostFavorite PostFavorite[]
+  lastLogout   DateTime?      @map("last_logout")
+  lastActive   DateTime?      @map("last_active")
 }
 
 enum Role {

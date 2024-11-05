@@ -1,9 +1,13 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { PassportStrategy } from '@nestjs/passport'
-import { User } from '@prisma/client'
 import { ExtractJwt, Strategy } from 'passport-jwt'
 import { PrismaService } from '../../prisma/prisma.service'
+
+interface JwtPayload {
+	id: number
+	iat: number
+}
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -13,12 +17,31 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 	) {
 		super({
 			jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-			ignoreExpiration: true,
+			ignoreExpiration: false,
 			secretOrKey: configService.get('JWT_SECRET')
 		})
 	}
 
-	async validate({ id }: Pick<User, 'id'>) {
-		return this.prisma.user.findUnique({ where: { id: +id } })
+	async validate(payload: JwtPayload) {
+		const user = await this.prisma.user.findUnique({
+			where: { id: payload.id }
+		})
+
+		if (!user) {
+			throw new UnauthorizedException('User not found')
+		}
+
+		const tokenIssuedAt = new Date(payload.iat * 1000)
+
+		if (user.lastLogout && tokenIssuedAt < user.lastLogout) {
+			throw new UnauthorizedException('User is logged out')
+		}
+
+		await this.prisma.user.update({
+			where: { id: payload.id },
+			data: { lastActive: new Date() }
+		})
+
+		return user
 	}
 }
