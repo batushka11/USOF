@@ -17,9 +17,12 @@ export const ApiGetCommentById = () =>
 			description: 'Successfully retrieved comment.',
 			schema: {
 				example: {
-					id: 1,
-					content: 'This is a comment',
-					authorId: 1
+					id: 3,
+					authorId: 13,
+					publishAt: '2024-11-04T01:57:02.570Z',
+					content: 'Arcus venustas animus velum carbo subvenio.',
+					postId: 12,
+					rating: 1
 				}
 			}
 		}),
@@ -47,7 +50,24 @@ export const ApiGetLikesByCommentId = () =>
 			status: 200,
 			description: 'Successfully retrieved likes for the comment.',
 			schema: {
-				example: [{ id: 1, commentId: 1, authorId: 2, type: 'LIKE' }]
+				example: [
+					{
+						id: 261,
+						authorId: 1,
+						publishAt: '2024-11-05T16:04:14.716Z',
+						postId: null,
+						commentId: 1,
+						type: 'LIKE'
+					},
+					{
+						id: 106,
+						authorId: 5,
+						publishAt: '2024-11-04T12:35:46.885Z',
+						postId: null,
+						commentId: 1,
+						type: 'DISLIKE'
+					}
+				]
 			}
 		}),
 		ApiResponse({
@@ -75,7 +95,14 @@ export const ApiCreateLikeByCommentId = () =>
 			status: 200,
 			description: 'Successfully liked the comment.',
 			schema: {
-				example: { id: 1, commentId: 1, authorId: 2, type: 'LIKE' }
+				example: {
+					id: 261,
+					authorId: 1,
+					publishAt: '2024-11-05T16:04:14.716Z',
+					postId: null,
+					commentId: 1,
+					type: 'LIKE'
+				}
 			}
 		}),
 		ApiResponse({
@@ -112,7 +139,15 @@ export const ApiUpdateCommentById = () =>
 			status: 200,
 			description: 'Successfully updated the comment.',
 			schema: {
-				example: { id: 1, content: 'Updated comment content' }
+				example: {
+					id: 3,
+					authorId: 13,
+					publishAt: '2024-11-04T01:57:02.570Z',
+					content:
+						'Update content: Arcus venustas animus velum carbo subvenio.',
+					postId: 12,
+					rating: 1
+				}
 			}
 		}),
 		ApiResponse({

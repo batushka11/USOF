@@ -91,11 +91,14 @@ export const ApiGetAllPosts = () =>
 				example: {
 					posts: [
 						{
-							id: 1,
-							title: 'First Post',
-							content: 'Content here',
-							authorId: 1,
-							status: 'ACTIVE'
+							id: 10,
+							publishAt: '2023-11-12T19:33:54.913Z',
+							status: 'ACTIVE',
+							content:
+								'Vero soleo videlicet occaecati cursim aspernatur. Urbs tam abstergo defero accedo tertius asper. Vociferor cedo tutamen doloribus uberrime vix basium suscipio.',
+							title: 'cado turpis',
+							authorId: 13,
+							rating: 4
 						}
 					],
 					totalCount: 100,
@@ -123,11 +126,14 @@ export const ApiGetPostById = () =>
 			description: 'Returns the post with the specified ID',
 			schema: {
 				example: {
-					id: 1,
-					title: 'First Post',
-					content: 'Content here',
-					authorId: 1,
-					status: 'ACTIVE'
+					id: 10,
+					publishAt: '2023-11-12T19:33:54.913Z',
+					status: 'ACTIVE',
+					content:
+						'Vero soleo videlicet occaecati cursim aspernatur. Urbs tam abstergo defero accedo tertius asper. Vociferor cedo tutamen doloribus uberrime vix basium suscipio.',
+					title: 'cado turpis',
+					authorId: 13,
+					rating: 4
 				}
 			}
 		}),
@@ -178,7 +184,16 @@ export const ApiGetCommentsByPostId = () =>
 			description: 'Returns comments for the post',
 			schema: {
 				example: {
-					comments: [{ id: 1, content: 'Nice post!', authorId: 2, postId: 1 }],
+					comments: [
+						{
+							id: 60,
+							authorId: 22,
+							publishAt: '2024-11-05T02:09:02.121Z',
+							content: 'This is a amazing',
+							postId: 21,
+							rating: 0
+						}
+					],
 					totalComments: 20,
 					page: 1,
 					limit: 10,
@@ -212,7 +227,16 @@ export const ApiGetLikesByPostId = () =>
 			status: 200,
 			description: 'Returns likes for the post',
 			schema: {
-				example: [{ id: 1, postId: 1, authorId: 2, type: 'LIKE' }]
+				example: [
+					{
+						id: 751,
+						authorId: 34,
+						publishAt: '2024-11-03T15:44:52.578Z',
+						postId: 2,
+						commentId: null,
+						type: 'LIKE'
+					}
+				]
 			}
 		}),
 		ApiResponse({
@@ -242,7 +266,14 @@ export const ApiAddCommentByPostId = () =>
 			status: 201,
 			description: 'Comment added successfully',
 			schema: {
-				example: { id: 2, content: 'This is a comment', authorId: 1, postId: 1 }
+				example: {
+					id: 63,
+					authorId: 22,
+					publishAt: '2024-11-05T13:10:00.305Z',
+					content: 'This is a amazing tematic',
+					postId: 21,
+					rating: 0
+				}
 			}
 		}),
 		ApiResponse({
@@ -268,7 +299,22 @@ export const ApiGetCategoriesByPostId = () =>
 			description: 'Returns categories associated with the post',
 			schema: {
 				example: [
-					{ id: 1, title: 'Technology', description: 'Tech-related posts' }
+					{
+						category: {
+							id: 7,
+							title: 'scratch',
+							description: 'clementia acer atrox',
+							createdAt: '2024-11-04T13:43:44.985Z'
+						}
+					},
+					{
+						category: {
+							id: 9,
+							title: 'veto',
+							description: 'acies at demoror',
+							createdAt: '2024-11-04T13:43:44.985Z'
+						}
+					}
 				]
 			}
 		}),
@@ -292,11 +338,14 @@ export const ApiCreatePost = () =>
 			description: 'Post created successfully',
 			schema: {
 				example: {
-					id: 1,
-					title: 'New Post',
-					content: 'Content here',
-					authorId: 1,
-					status: 'ACTIVE'
+					id: 10,
+					publishAt: '2023-11-12T19:33:54.913Z',
+					status: 'ACTIVE',
+					content:
+						'Vero soleo videlicet occaecati cursim aspernatur. Urbs tam abstergo defero accedo tertius asper. Vociferor cedo tutamen doloribus uberrime vix basium suscipio.',
+					title: 'cado turpis',
+					authorId: 13,
+					rating: 4
 				}
 			}
 		}),
@@ -325,7 +374,14 @@ export const ApiCreateLikeByPostId = () =>
 			status: 201,
 			description: 'Like added successfully',
 			schema: {
-				example: { id: 1, postId: 1, authorId: 2, type: 'LIKE' }
+				example: {
+					id: 67,
+					authorId: 5,
+					publishAt: '2024-11-03T19:41:07.228Z',
+					postId: 10,
+					commentId: null,
+					type: 'LIKE'
+				}
 			}
 		}),
 		ApiResponse({
@@ -443,13 +499,18 @@ export const ApiAddPostToFavorite = () =>
 			description: 'Successfully added post to favorites',
 			schema: {
 				example: {
-					id: 1,
+					postId: 22,
 					userId: 1,
-					postId: 1,
+					addAt: '2024-11-05T15:48:53.320Z',
 					post: {
-						id: 1,
-						title: 'Sample Post',
-						content: 'Post content here'
+						id: 22,
+						publishAt: '2024-11-05T02:16:40.232Z',
+						status: 'ACTIVE',
+						content:
+							'In this post, we will explore the fundamental concepts of web development, including HTML, CSS, and JavaScript. By the end of this article, you should have a solid understanding of how to build simple web pages.',
+						title: 'Understanding TypeScript Decorators',
+						authorId: 24,
+						rating: 0
 					}
 				}
 			}
@@ -513,13 +574,18 @@ export const ApiAddPostToSubscribe = () =>
 			description: 'Successfully added post to subscribe',
 			schema: {
 				example: {
-					id: 1,
+					postId: 15,
 					userId: 1,
-					postId: 1,
+					addAt: '2024-11-05T15:50:00.561Z',
 					post: {
-						id: 1,
-						title: 'Sample Post',
-						content: 'Post content here'
+						id: 15,
+						publishAt: '2024-06-16T12:10:47.578Z',
+						status: 'ACTIVE',
+						content:
+							'Cunabula turbo a creber cimentarius. Ago avaritia tepidus cohors dolores. Delectus demonstro tutis chirographum animus cimentarius nesciunt corona aptus.',
+						title: 'aptus rerum',
+						authorId: 17,
+						rating: 2
 					}
 				}
 			}

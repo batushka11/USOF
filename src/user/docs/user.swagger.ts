@@ -123,11 +123,18 @@ export const ApiCreateUser = () =>
 			description: 'User successfully created',
 			schema: {
 				example: {
-					id: 2,
+					id: 25,
 					login: 'user123',
 					fullname: 'John Doe',
 					email: 'johndoe@example.com',
-					role: 'USER'
+					avatarPath: 'default_avatar.png',
+					role: 'USER',
+					rating: 0,
+					isConfirm: true,
+					confirmToken: null,
+					createdAt: '2024-11-05T15:32:50.899Z',
+					lastLogout: null,
+					lastActive: null
 				}
 			}
 		}),
@@ -150,9 +157,19 @@ export const ApiUpdateUserAvatar = () =>
 			description: 'Avatar updated successfully',
 			schema: {
 				example: {
-					id: 1,
+					id: 25,
+					login: 'user123',
+					fullname: 'John Doe',
+					email: 'johndoe@example.com',
 					avatarPath:
-						'https://speakaboutit.s3.eu-north-1.amazonaws.com/18b7434d2-0436-4f59-1de7-d9b02ad505b9-2021-09-14+21.22.36.jpg'
+						'https://speakaboutit.s3.eu-north-1.amazonaws.com/b064b853-4a31-4413-84db-27940a740628-2024-09-14%2021.22.36.jpg',
+					role: 'USER',
+					rating: 0,
+					isConfirm: true,
+					confirmToken: null,
+					createdAt: '2024-11-05T15:32:50.899Z',
+					lastLogout: null,
+					lastActive: null
 				}
 			}
 		}),
@@ -191,8 +208,18 @@ export const ApiUpdateUserInfo = () =>
 			schema: {
 				example: {
 					id: 1,
-					fullname: 'John Smith',
-					email: 'johnsmith@example.com'
+					login: 'JohnSmith',
+					fullname: 'Andrii Zhupanov',
+					email: 'johnsmith@example.com',
+					avatarPath:
+						'https://speakaboutit.s3.eu-north-1.amazonaws.com/default_avatar.png',
+					role: 'ADMIN',
+					rating: 0,
+					isConfirm: true,
+					confirmToken: null,
+					createdAt: '2024-11-04T13:43:44.104Z',
+					lastLogout: '2024-11-05T00:55:17.943Z',
+					lastActive: '2024-11-05T15:35:06.263Z'
 				}
 			}
 		}),

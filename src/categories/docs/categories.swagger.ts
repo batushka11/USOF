@@ -34,8 +34,9 @@ export const ApiGetAllCategories = () =>
 					categories: [
 						{
 							id: 1,
-							title: 'Technology',
-							description: 'All about tech and gadgets'
+							title: 'peony',
+							description: 'natus repellendus acervus',
+							createdAt: '2024-11-04T13:43:44.985Z'
 						}
 					],
 					totalCount: 100,
@@ -63,9 +64,10 @@ export const ApiGetCategoryById = () =>
 			description: 'Returns details of the specified category',
 			schema: {
 				example: {
-					id: 1,
-					title: 'Technology',
-					description: 'All about tech and gadgets'
+					id: 9,
+					title: 'veto',
+					description: 'acies at demoror',
+					createdAt: '2024-11-04T13:43:44.985Z'
 				}
 			}
 		}),
@@ -89,26 +91,29 @@ export const ApiGetPostsByCategoryId = () =>
 		}),
 		ApiResponse({
 			status: 200,
-			description: 'List of posts associated with the category.',
+			description:
+				'List of posts associated with the category with pagination.',
 			schema: {
-				example: [
-					{
-						id: 41,
-						publishAt: '2023-05-01T10:15:30.000Z',
-						status: 'ACTIVE',
-						content: 'Example content for post 41...',
-						title: 'Sample Post 41',
-						authorId: 5
-					},
-					{
-						id: 44,
-						publishAt: '2023-05-02T10:15:30.000Z',
-						status: 'ACTIVE',
-						content: 'Example content for post 44...',
-						title: 'Sample Post 44',
-						authorId: 8
-					}
-				]
+				example: {
+					posts: [
+						{
+							id: 10,
+							publishAt: '2023-11-12T19:33:54.913Z',
+							status: 'ACTIVE',
+							content:
+								'Vero soleo videlicet occaecati cursim aspernatur. Urbs tam abstergo defero accedo tertius asper. Vociferor cedo tutamen doloribus uberrime vix basium suscipio.',
+							title: 'cado turpis',
+							authorId: 13,
+							rating: 4
+						}
+					],
+					totalCount: 100,
+					page: 1,
+					limit: 10,
+					totalPages: 10,
+					nextPage: 2,
+					previousPage: null
+				}
 			}
 		}),
 		ApiResponse({
@@ -132,9 +137,10 @@ export const ApiCreateCategory = () =>
 			description: 'Category created successfully',
 			schema: {
 				example: {
-					id: 2,
-					title: 'Science',
-					description: 'Latest discoveries and updates in science'
+					id: 11,
+					title: 'Football',
+					description: 'All about football',
+					createdAt: '2024-11-05T15:53:02.131Z'
 				}
 			}
 		}),

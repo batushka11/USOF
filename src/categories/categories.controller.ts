@@ -63,9 +63,14 @@ export class CategoriesController {
 	@Get('/:id/posts')
 	async getPostsByCategoryId(
 		@Param('id', ParseIntPipe) id: number,
-		@CurrentUser() user: User
+		@CurrentUser() user: User,
+		@PaginationParams() paginationParams: Pagination
 	) {
-		return this.categoriesService.getPostsByCategoryId(id, user)
+		return this.categoriesService.getPostsByCategoryId(
+			id,
+			user,
+			paginationParams
+		)
 	}
 
 	@ApiCreateCategory()
