@@ -1,6 +1,7 @@
 ![NestJS](https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
 ![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white)
+![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)
 ![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)
 ![Swagger](https://img.shields.io/badge/-Swagger-%23Clojure?style=for-the-badge&logo=swagger&logoColor=white)
 ![NPM](https://img.shields.io/badge/NPM-%23CB3837.svg?style=for-the-badge&logo=npm&logoColor=white)
@@ -9,10 +10,11 @@
 
 # Speak About It
 
-Speak About It is a question-and-answer platform designed for both professional and enthusiast programmers. Inspired by the collaborative environment of forums like Stack Overflow, **Speak About It** allows users to share their challenges and solutions through short posts, receive community feedback, and build a reputation based on their contributions. This project, developed with **NestJS**, **Prisma**, **MySQL** and **AWS**, is an API-driven solution aimed at fostering knowledge-sharing and community engagement.
+Speak About It is a question-and-answer platform designed for both professional and enthusiast programmers. Inspired by the collaborative environment of forums like Stack Overflow, **Speak About It** allows users to share their challenges and solutions through short posts, receive community feedback, and build a reputation based on their contributions. This project, developed with **NestJS**, **Prisma**, **MySQL**, **Node.js** and **AWS**, is an API-driven solution aimed at fostering knowledge-sharing and community engagement.
 
 ## Table of Contents
 
+- [Technology Stack](#technology-stack)
 - [Features](#features)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
@@ -22,6 +24,21 @@ Speak About It is a question-and-answer platform designed for both professional 
   - [Accessing the Admin Panel](#accessing-the-admin-panel)
   - [Documentation](#documentation)
 - [License](#license)
+
+---
+
+## Technology Stack
+
+The project is built using the following technologies:
+
+- **NestJS**: The primary framework used for building the API, providing a robust structure and modular approach.
+- **TypeScript**: Ensures type safety and improves code maintainability across the project.
+- **Prisma**: An ORM (Object-Relational Mapper) used for seamless interaction with the MySQL database.
+- **Node.js**: The JavaScript runtime environment that powers the backend, enabling scalable and efficient server-side execution.
+- **AWS**: Used for storing user avatars securely, leveraging Amazon Web Services' storage solutions.
+- **Swagger**: Offers API documentation to simplify endpoint testing and integration for developers.
+- **NPM**: The Node Package Manager, used for managing project dependencies.
+- **JWT**: JSON Web Tokens are used for secure user authentication, ensuring a safe login experience.
 
 ---
 
