@@ -12,12 +12,10 @@ Speak About It is a question-and-answer platform designed for both professional 
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
-  - [Environment Variables](#environment-variables)
 - [Usage](#usage)
   - [Running the Application](#running-the-application)
   - [Accessing the Admin Panel](#accessing-the-admin-panel)
   - [Documentation](#documentation)
-- [Contributing](#contributing)
 - [License](#license)
 
 ---
@@ -44,7 +42,97 @@ Ensure you have the following installed:
 ### Installation
 
 1. **Clone the repository**:
+
    ```bash
    git clone https://github.com/yourusername/speak-about-it.git
+   ```
+
+2. **Navigate to the Project Folder**:
+
+   ```bash
    cd speak-about-it
    ```
+
+3. **Set Up Environment Variables**: An .env.example file is provided with all the required environment variables. Create a .env file by copying .env.example and then fill in the necessary values.
+
+   ```bash
+   cp .env.example .env
+   ```
+
+4. **Install dependencies**: Install all necessary dependencies for the project by running:
+
+   ```bash
+   npm install
+   ```
+
+5. **Generate Prisma Client**: Prisma is used for database management. Generate the Prisma client to interact with your MySQL database:
+
+   ```bash
+   npx prisma generate
+   ```
+
+6. **Create the Database**: Use Prisma to create the initial database schema:
+
+   ```bash
+   npx prisma db push
+   ```
+
+7. **Migrate the Database**: Apply database migrations to ensure your MySQL database schema matches the project structure:
+
+   ```bash
+   npx prisma migrate dev
+   ```
+
+8. **Seed the Database**: Populate the database with initial data by running:
+
+   ```bash
+   npx run seed
+   ```
+
+---
+
+## Usage
+
+### Running the Application
+
+Start the application using:
+
+```bash
+ npm run start
+```
+
+By default, the app will be available at http://localhost:4200
+
+### Accessing the Admin Panel
+
+1. **To access the admin panel, navigate to**:
+
+   ```bash
+   http://localhost:4200/admin
+   ```
+
+2. **Log in using the administrator panel by provided email and password**.
+
+   ```bash
+   email: admin@example.com
+   password: 12345678
+   ```
+
+### Documentation
+
+For detailed information on API endpoints, request parameters, and usage examples, visit the API documentation site:
+
+- [Documentation Site]()
+
+This site provides comprehensive information to help you integrate and test various parts of the API.
+Also you can see documentation using URL:
+
+```bash
+ http://localhost:4200/docs
+```
+
+---
+
+## License
+
+This project is licensed under the MIT License. See the full license text below.
