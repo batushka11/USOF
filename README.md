@@ -73,13 +73,13 @@ Ensure you have the following installed:
 1. **Clone the repository**:
 
    ```bash
-   git clone https://github.com/batushka11/USOF.git
+   git clone git@gitlab.ucode.world:connect-khpi/connect-fullstack-usof-backend/azhupanov.git
    ```
 
 2. **Navigate to the Project Folder**:
 
    ```bash
-   cd USOF
+   cd azhupanov
    ```
 
 3. **Set Up Environment Variables**: An .env.example file is provided with all the required environment variables. Create a .env file by copying .env.example and then fill in the necessary values.
