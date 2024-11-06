@@ -73,13 +73,13 @@ Ensure you have the following installed:
 1. **Clone the repository**:
 
    ```bash
-   git clone git@gitlab.ucode.world:connect-khpi/connect-fullstack-usof-backend/azhupanov.git
+   git clone https://github.com/batushka11/USOF.git
    ```
 
 2. **Navigate to the Project Folder**:
 
    ```bash
-   cd azhupanov
+   cd USOF
    ```
 
 3. **Set Up Environment Variables**: An .env.example file is provided with all the required environment variables. Create a .env file by copying .env.example and then fill in the necessary values.
@@ -106,13 +106,7 @@ Ensure you have the following installed:
    npx prisma db push
    ```
 
-7. **Migrate the Database**: Apply database migrations to ensure your MySQL database schema matches the project structure:
-
-   ```bash
-   npx prisma migrate dev
-   ```
-
-8. **Seed the Database**: Populate the database with initial data by running:
+7. **Seed the Database**: Populate the database with initial data by running:
 
    ```bash
    npm run seed
