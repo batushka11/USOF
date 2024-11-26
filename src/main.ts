@@ -7,7 +7,17 @@ async function bootstrap() {
 	const app = await NestFactory.create(AppModule)
 
 	app.setGlobalPrefix('api')
-	app.enableCors()
+	app.enableCors({
+		origin: (origin, callback) => {
+			if (!origin) {
+				return callback(null, true)
+			}
+			callback(null, true)
+		},
+		credentials: true,
+		methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+		allowedHeaders: ['Content-Type', 'Authorization']
+	})
 	app.use(cookieParser())
 
 	const config = new DocumentBuilder()

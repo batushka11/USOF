@@ -8,6 +8,7 @@ import {
 	ParseIntPipe,
 	Patch,
 	Post,
+	UseGuards,
 	UsePipes,
 	ValidationPipe
 } from '@nestjs/common'
@@ -18,6 +19,7 @@ import { CommentsService } from './comments.service'
 import { CreateLikeDto } from './dto/create_like.dto'
 import { UpdateCommentDto } from './dto/update_comment.dto'
 
+import { AuthGuard } from '@nestjs/passport'
 import {
 	ApiCreateLikeByCommentId,
 	ApiDeleteCommentById,
@@ -31,6 +33,7 @@ import {
 @ApiTags('Comments')
 @ApiBearerAuth()
 @Controller('comments')
+@UseGuards(AuthGuard('jwt'))
 export class CommentsController {
 	constructor(private readonly commentsService: CommentsService) {}
 

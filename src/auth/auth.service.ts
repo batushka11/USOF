@@ -35,12 +35,11 @@ export class AuthService {
 		})
 		res.cookie('refreshToken', tokens.refreshToken, {
 			httpOnly: true,
-			secure: process.env.NODE_ENV === 'production',
 			sameSite: 'strict',
 			maxAge: 7 * 24 * 60 * 60 * 1000
 		})
 		res.send({
-			user: this.returnUserFields(user),
+			user,
 			accessToken: tokens.accessToken
 		})
 	}
@@ -125,7 +124,7 @@ export class AuthService {
 			}
 		)
 
-		const url = `http://localhost:4200/api/auth/password-reset/${token}`
+		const url = `http://localhost:3000/password-reset/${token}`
 
 		await this.mailerService.sendMail({
 			to: email,
@@ -225,7 +224,7 @@ export class AuthService {
 		token: string,
 		username: string
 	) {
-		const url = `http://localhost:4200/api/auth/register?token=${token}`
+		const url = `http://localhost:3000/confirmation/${token}`
 		await this.mailerService.sendMail({
 			to: email,
 			subject: 'Email confirmation',

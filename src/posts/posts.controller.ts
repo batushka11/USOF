@@ -26,6 +26,7 @@ import { CreatePostDto } from './dto/create_post.dto'
 import { UpdatePostDto } from './dto/update_post.dto'
 import { PostsService } from './posts.service'
 
+import { AuthGuard } from '@nestjs/passport'
 import { Filtering } from 'src/filtering/filter.interface'
 import { FilteringParams } from 'src/filtering/filter_params.decorator'
 import { Sorting } from 'src/sorting/sort.interface'
@@ -52,7 +53,7 @@ import {
 @ApiBearerAuth()
 @Auth()
 @Controller('posts')
-@UseGuards(RolesGuard)
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 export class PostsController {
 	constructor(private readonly postsService: PostsService) {}
 
