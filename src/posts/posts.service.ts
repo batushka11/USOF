@@ -399,14 +399,14 @@ export class PostsService {
 		const post = await this.findPostOrFail(postId)
 
 		if (post.status === Status.INACTIVE)
-			throw new BadRequestException('You cannot add inactive post to favorite')
+			throw new BadRequestException('You cannot add inactive post to bookmarks')
 
 		const favorite = await this.prisma.postFavorite.findFirst({
 			where: { userId, postId }
 		})
 
 		if (favorite) {
-			throw new ConflictException('User has already add this post to favorite')
+			throw new ConflictException('You have already add this post to bookmarks')
 		}
 
 		await this.prisma.postFavorite.create({
@@ -435,7 +435,7 @@ export class PostsService {
 		})
 
 		if (!favorite)
-			throw new NotFoundException('User doesn’t has this post in favorite')
+			throw new NotFoundException('You don’t have this post in favorite')
 
 		if (favorite.userId !== userId) throw new ForbiddenException()
 
@@ -457,7 +457,7 @@ export class PostsService {
 		})
 
 		if (subscribe) {
-			throw new ConflictException('User has already add this post to subscribe')
+			throw new ConflictException('You have already add this post to subscribe')
 		}
 
 		await this.prisma.postSubscribe.create({
@@ -486,7 +486,7 @@ export class PostsService {
 		})
 
 		if (!subscribe)
-			throw new NotFoundException('User doesn’t has this post in subscribe')
+			throw new NotFoundException('You don’t have this post in subscribe')
 
 		if (subscribe.userId !== userId) throw new ForbiddenException()
 

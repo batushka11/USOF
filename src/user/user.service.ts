@@ -152,8 +152,9 @@ export class UserService {
 			this.prisma.postFavorite.count({ where: { userId } })
 		])
 
+		const transformedPosts = posts.map(favorite => favorite.post)
 		if (posts.length < 1)
-			throw new NotFoundException('User does not have any favorite posts')
+			throw new NotFoundException('You do not have any favorite posts')
 
 		const totalPages = Math.ceil(totalCount / limit)
 		const hasNextPage = page < totalPages
@@ -162,7 +163,7 @@ export class UserService {
 		const previousPage = hasPreviousPage ? page - 1 : null
 
 		return {
-			posts,
+			posts: transformedPosts,
 			totalCount,
 			page,
 			limit,
@@ -185,7 +186,7 @@ export class UserService {
 		])
 
 		if (posts.length < 1)
-			throw new NotFoundException('User does not have any subscribe posts')
+			throw new NotFoundException('You do not have any subscribe posts')
 
 		const totalPages = Math.ceil(totalCount / limit)
 		const hasNextPage = page < totalPages
