@@ -198,7 +198,7 @@ export class AuthService {
 			})
 
 			return res.json({
-				user: this.returnUserFields(user),
+				user,
 				accessToken: tokens.accessToken
 			})
 		} catch (e) {

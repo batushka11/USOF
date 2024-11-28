@@ -61,6 +61,15 @@ export class UserController {
 		return this.userService.getSubscribePost(id, paginationParams)
 	}
 
+	@HttpCode(200)
+	@Get('/:id/posts')
+	async getUserPost(
+		@Param('id', ParseIntPipe) id: number,
+		@PaginationParams() paginationParams: Pagination
+	) {
+		return this.userService.getUserPost(id, paginationParams)
+	}
+
 	@ApiGetFavoritePosts()
 	@HttpCode(200)
 	@Get('/favorite')

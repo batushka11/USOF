@@ -6,7 +6,7 @@ import * as dotenv from 'dotenv'
 dotenv.config()
 const prisma = new PrismaClient()
 
-//password:12345678
+// password: 12345678
 async function createAdmin(): Promise<User> {
 	return prisma.user.create({
 		data: {
@@ -61,14 +61,22 @@ async function createPosts(
 	categories: Category[]
 ): Promise<Post[]> {
 	return Promise.all(
-		Array.from({ length: 20 }).map(async () => {
+		Array.from({ length: 83 }).map(async () => {
+			const author = users[Math.floor(Math.random() * users.length)]
 			const post = await prisma.post.create({
 				data: {
 					publishAt: faker.date.past(),
 					status: faker.helpers.arrayElement(['ACTIVE', 'INACTIVE']),
 					title: faker.lorem.words(2),
-					content: faker.lorem.paragraph(),
-					authorId: users[Math.floor(Math.random() * users.length)].id
+					content: faker.lorem.paragraphs(5),
+					authorId: author.id
+				}
+			})
+
+			await prisma.user.update({
+				where: { id: author.id },
+				data: {
+					postsCount: { increment: 1 }
 				}
 			})
 
@@ -98,15 +106,27 @@ async function createComments(
 ): Promise<Comment[]> {
 	return Promise.all(
 		posts.flatMap(post =>
-			Array.from({ length: faker.number.int({ min: 1, max: 5 }) }).map(() =>
-				prisma.comment.create({
-					data: {
-						content: faker.lorem.sentence().slice(0, 255),
-						publishAt: faker.date.recent(),
-						authorId: users[Math.floor(Math.random() * users.length)].id,
-						postId: post.id
-					}
-				})
+			Array.from({ length: faker.number.int({ min: 1, max: 5 }) }).map(
+				async () => {
+					const author = users[Math.floor(Math.random() * users.length)]
+					const comment = await prisma.comment.create({
+						data: {
+							content: faker.lorem.sentence().slice(0, 255),
+							publishAt: faker.date.recent(),
+							authorId: author.id,
+							postId: post.id
+						}
+					})
+
+					await prisma.user.update({
+						where: { id: author.id },
+						data: {
+							commentsCount: { increment: 1 }
+						}
+					})
+
+					return comment
+				}
 			)
 		)
 	)
@@ -131,6 +151,14 @@ async function createPostLikes(users: User[], posts: Post[]) {
 						postId: post.id
 					}
 				})
+
+				await prisma.user.update({
+					where: { id: user.id },
+					data: {
+						reactionsCount: { increment: 1 }
+					}
+				})
+
 				await prisma.post.update({
 					where: { id: post.id },
 					data: {
@@ -165,6 +193,14 @@ async function createCommentLikes(users: User[], comments: Comment[]) {
 						commentId: comment.id
 					}
 				})
+
+				await prisma.user.update({
+					where: { id: user.id },
+					data: {
+						reactionsCount: { increment: 1 }
+					}
+				})
+
 				await prisma.comment.update({
 					where: { id: comment.id },
 					data: {
@@ -213,7 +249,7 @@ async function main() {
 	await createCommentLikes(users, comments)
 	await updateUserRatings(users)
 	console.log(
-		'Seed data created: 20 users, 20 posts with random statuses, categories, comments, and likes.'
+		'Seed data created: 20 users, 83 posts with random statuses, categories, comments, and likes.'
 	)
 }
 

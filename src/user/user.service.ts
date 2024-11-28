@@ -147,13 +147,27 @@ export class UserService {
 				take: limit,
 				skip: offset,
 				orderBy: { addAt: 'desc' },
-				include: { post: true }
+				include: {
+					post: {
+						include: {
+							PostFavorite: {
+								where: { userId },
+								select: { postId: true }
+							},
+							PostSubscribe: {
+								where: { userId },
+								select: { postId: true }
+							}
+						}
+					}
+				}
 			}),
 			this.prisma.postFavorite.count({ where: { userId } })
 		])
 
-		if (posts.length < 1)
+		if (posts.length < 1) {
 			throw new NotFoundException('You do not have any favorite posts')
+		}
 
 		const totalPages = Math.ceil(totalCount / limit)
 		const hasNextPage = page < totalPages
@@ -162,7 +176,11 @@ export class UserService {
 		const previousPage = hasPreviousPage ? page - 1 : null
 
 		return {
-			posts: posts.map(favorite => favorite.post),
+			posts: posts.map(favorite => ({
+				...favorite.post,
+				isBookmarked: favorite.post.PostFavorite.length > 0,
+				isSubscribed: favorite.post.PostSubscribe.length > 0
+			})),
 			totalCount,
 			page,
 			limit,
@@ -179,13 +197,27 @@ export class UserService {
 				take: limit,
 				skip: offset,
 				orderBy: { addAt: 'desc' },
-				include: { post: true }
+				include: {
+					post: {
+						include: {
+							PostFavorite: {
+								where: { userId },
+								select: { postId: true }
+							},
+							PostSubscribe: {
+								where: { userId },
+								select: { postId: true }
+							}
+						}
+					}
+				}
 			}),
 			this.prisma.postSubscribe.count({ where: { userId } })
 		])
 
-		if (posts.length < 1)
-			throw new NotFoundException('You do not have any subscribe posts')
+		if (posts.length < 1) {
+			throw new NotFoundException('You do not have any subscribed posts')
+		}
 
 		const totalPages = Math.ceil(totalCount / limit)
 		const hasNextPage = page < totalPages
@@ -194,7 +226,61 @@ export class UserService {
 		const previousPage = hasPreviousPage ? page - 1 : null
 
 		return {
-			posts: posts.map(subscribe => subscribe.post),
+			posts: posts.map(subscribe => ({
+				...subscribe.post,
+				isBookmarked: subscribe.post.PostFavorite.length > 0,
+				isSubscribed: subscribe.post.PostSubscribe.length > 0
+			})),
+			totalCount,
+			page,
+			limit,
+			totalPages,
+			nextPage,
+			previousPage
+		}
+	}
+
+	async getUserPost(userId: number, { page, limit, offset }: Pagination) {
+		const [posts, totalCount] = await Promise.all([
+			this.prisma.post.findMany({
+				where: { authorId: userId },
+				take: limit,
+				skip: offset,
+				orderBy: { publishAt: 'desc' },
+				include: {
+					PostFavorite: {
+						where: { userId },
+						select: { postId: true }
+					},
+					PostSubscribe: {
+						where: { userId },
+						select: { postId: true }
+					}
+				}
+			}),
+			this.prisma.post.count({ where: { authorId: userId } })
+		])
+
+		if (posts.length < 1) {
+			throw new NotFoundException('You do not have any posts')
+		}
+
+		const enrichedPosts = posts.map(
+			({ PostFavorite, PostSubscribe, ...post }) => ({
+				...post,
+				isBookmarked: PostFavorite.length > 0,
+				isSubscribed: PostSubscribe.length > 0
+			})
+		)
+
+		const totalPages = Math.ceil(totalCount / limit)
+		const hasNextPage = page < totalPages
+		const hasPreviousPage = page > 1
+		const nextPage = hasNextPage ? page + 1 : null
+		const previousPage = hasPreviousPage ? page - 1 : null
+
+		return {
+			posts: enrichedPosts,
 			totalCount,
 			page,
 			limit,

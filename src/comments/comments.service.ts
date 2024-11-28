@@ -70,6 +70,9 @@ export class CommentsService {
 			data: {
 				rating: {
 					increment: interactionType === Type.LIKE ? 1 : -1
+				},
+				reactionsCount: {
+					increment: 1
 				}
 			}
 		})

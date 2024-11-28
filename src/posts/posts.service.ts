@@ -63,8 +63,8 @@ export class PostsService {
 			const rawTitleSearchResults = await this.prisma.$queryRaw<
 				{ id: number }[]
 			>`
-				SELECT id FROM Post WHERE LOWER(title) LIKE CONCAT('%', LOWER(${title}), '%')
-			`
+            SELECT id FROM Post WHERE LOWER(title) LIKE CONCAT('%', LOWER(${title}), '%')
+        `
 			postIds = rawTitleSearchResults.map(post => post.id)
 			where.id = { in: postIds }
 		}
@@ -74,7 +74,25 @@ export class PostsService {
 				where,
 				take: limit,
 				skip: offset,
-				orderBy: { [sortBy]: order }
+				orderBy: { [sortBy]: order },
+				include: {
+					PostFavorite: {
+						where: {
+							userId: user.id
+						},
+						select: {
+							postId: true
+						}
+					},
+					PostSubscribe: {
+						where: {
+							userId: user.id
+						},
+						select: {
+							postId: true
+						}
+					}
+				}
 			}),
 			this.prisma.post.count({ where })
 		])
@@ -85,8 +103,16 @@ export class PostsService {
 		const nextPage = hasNextPage ? page + 1 : null
 		const previousPage = hasPreviousPage ? page - 1 : null
 
+		const enrichedPosts = posts.map(
+			({ PostFavorite, PostSubscribe, ...post }) => ({
+				...post,
+				isBookmarked: PostFavorite.length > 0,
+				isSubscribed: PostSubscribe.length > 0
+			})
+		)
+
 		return {
-			posts,
+			posts: enrichedPosts,
 			totalCount,
 			page,
 			limit,
@@ -154,6 +180,15 @@ export class PostsService {
 			include: { user: true }
 		})
 
+		await this.prisma.user.update({
+			where: { id: authorId },
+			data: {
+				commentsCount: {
+					increment: 1
+				}
+			}
+		})
+
 		for (const subscriber of subscribers) {
 			await this.mailerService.sendMail({
 				to: subscriber.user.email,
@@ -219,6 +254,15 @@ export class PostsService {
 	async createPost(dto: CreatePostDto, authorId: number) {
 		const categoryIds = await this.handleCategories(dto.categories)
 
+		await this.prisma.user.update({
+			where: { id: authorId },
+			data: {
+				postsCount: {
+					increment: 1
+				}
+			}
+		})
+
 		return this.prisma.post.create({
 			data: {
 				title: dto.title,
@@ -273,6 +317,9 @@ export class PostsService {
 			data: {
 				rating: {
 					increment: interactionType === Type.LIKE ? 1 : -1
+				},
+				reactionsCount: {
+					increment: 1
 				}
 			}
 		})
