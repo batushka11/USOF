@@ -4,10 +4,13 @@ import {
 	Injectable,
 	NotFoundException
 } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { Role, User } from '@prisma/client'
 import { hash } from 'argon2'
+import { Filtering } from 'src/filtering/filter.interface'
 import { Pagination } from 'src/pagination/pagination_params.decorator'
 import { PrismaService } from 'src/prisma/prisma.service'
+import { Sorting } from 'src/sorting/sort.interface'
 import { S3Service } from './aws_service/s3.service'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
@@ -16,14 +19,19 @@ import { UpdateUserDto } from './dto/update-user.dto'
 export class UserService {
 	constructor(
 		private prisma: PrismaService,
-		private s3Service: S3Service
+		private s3Service: S3Service,
+		private readonly configService: ConfigService
 	) {}
 
-	async getAllUsers({ page, limit, size, offset }: Pagination) {
+	async getAllUsers(
+		{ page, limit, size, offset }: Pagination,
+		{ sortBy, order }: Sorting
+	) {
 		const [users, totalCount] = await Promise.all([
 			this.prisma.user.findMany({
 				take: limit,
-				skip: offset
+				skip: offset,
+				orderBy: { [sortBy]: order }
 			}),
 			this.prisma.user.count()
 		])
@@ -66,7 +74,8 @@ export class UserService {
 				email: dto.email,
 				password: await hash(dto.password),
 				role: dto.role,
-				isConfirm: true
+				isConfirm: true,
+				avatarPath: this.configService.get<string>('AWS_DEFAULT_IMAGE_URL')
 			}
 		})
 
@@ -140,13 +149,50 @@ export class UserService {
 		}
 	}
 
-	async getFavoritePost(userId: number, { page, limit, offset }: Pagination) {
+	async getFavoritePost(
+		userId: number,
+		{ page, limit, offset }: Pagination,
+		{ sortBy, order }: Sorting,
+		{ date, status, title, category }: Filtering
+	) {
+		const where: any = {}
+
+		if (category && category.length > 0) {
+			where.categories = {
+				some: {
+					category: {
+						title: { in: category }
+					}
+				}
+			}
+		}
+
+		if (date?.start || date?.end) {
+			where.publishAt = {
+				...(date.start && { gte: new Date(date.start) }),
+				...(date.end && { lte: new Date(date.end) })
+			}
+		}
+
+		let postIds = []
+
+		if (title) {
+			const rawTitleSearchResults = await this.prisma.$queryRaw<
+				{ id: number }[]
+			>`
+            SELECT id FROM Post WHERE LOWER(title) LIKE CONCAT('%', LOWER(${title}), '%')
+        `
+			postIds = rawTitleSearchResults.map(post => post.id)
+			where.id = { in: postIds }
+		}
 		const [posts, totalCount] = await Promise.all([
 			this.prisma.postFavorite.findMany({
-				where: { userId },
+				where: { userId, post: where },
 				take: limit,
 				skip: offset,
-				orderBy: { addAt: 'desc' },
+				orderBy: {
+					post: { [sortBy]: order }
+				},
 				include: {
 					post: {
 						include: {
@@ -190,13 +236,50 @@ export class UserService {
 		}
 	}
 
-	async getSubscribePost(userId: number, { page, limit, offset }: Pagination) {
+	async getSubscribePost(
+		userId: number,
+		{ page, limit, offset }: Pagination,
+		{ sortBy, order }: Sorting,
+		{ date, status, title, category }: Filtering
+	) {
+		const where: any = {}
+
+		if (category && category.length > 0) {
+			where.categories = {
+				some: {
+					category: {
+						title: { in: category }
+					}
+				}
+			}
+		}
+
+		if (date?.start || date?.end) {
+			where.publishAt = {
+				...(date.start && { gte: new Date(date.start) }),
+				...(date.end && { lte: new Date(date.end) })
+			}
+		}
+
+		let postIds = []
+
+		if (title) {
+			const rawTitleSearchResults = await this.prisma.$queryRaw<
+				{ id: number }[]
+			>`
+            SELECT id FROM Post WHERE LOWER(title) LIKE CONCAT('%', LOWER(${title}), '%')
+        `
+			postIds = rawTitleSearchResults.map(post => post.id)
+			where.id = { in: postIds }
+		}
 		const [posts, totalCount] = await Promise.all([
 			this.prisma.postSubscribe.findMany({
-				where: { userId },
+				where: { userId, post: where },
 				take: limit,
 				skip: offset,
-				orderBy: { addAt: 'desc' },
+				orderBy: {
+					post: { [sortBy]: order }
+				},
 				include: {
 					post: {
 						include: {
@@ -240,13 +323,53 @@ export class UserService {
 		}
 	}
 
-	async getUserPost(userId: number, { page, limit, offset }: Pagination) {
+	async getUserPost(
+		userId: number,
+		{ page, limit, offset }: Pagination,
+		{ sortBy, order }: Sorting,
+		{ date, status, title, category }: Filtering,
+		user: User
+	) {
+		const where: any = {}
+
+		where.authorId = userId
+
+		where.status = user.role === Role.ADMIN ? status : 'ACTIVE'
+
+		if (category && category.length > 0) {
+			where.categories = {
+				some: {
+					category: {
+						title: { in: category }
+					}
+				}
+			}
+		}
+
+		if (date?.start || date?.end) {
+			where.publishAt = {
+				...(date.start && { gte: new Date(date.start) }),
+				...(date.end && { lte: new Date(date.end) })
+			}
+		}
+
+		let postIds = []
+
+		if (title) {
+			const rawTitleSearchResults = await this.prisma.$queryRaw<
+				{ id: number }[]
+			>`
+            SELECT id FROM Post WHERE LOWER(title) LIKE CONCAT('%', LOWER(${title}), '%')
+        `
+			postIds = rawTitleSearchResults.map(post => post.id)
+			where.id = { in: postIds }
+		}
 		const [posts, totalCount] = await Promise.all([
 			this.prisma.post.findMany({
-				where: { authorId: userId },
+				where,
 				take: limit,
 				skip: offset,
-				orderBy: { publishAt: 'desc' },
+				orderBy: { [sortBy]: 'desc' },
 				include: {
 					PostFavorite: {
 						where: { userId },

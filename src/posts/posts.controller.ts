@@ -13,7 +13,7 @@ import {
 	ValidationPipe
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
-import { Role, User } from '@prisma/client'
+import { User } from '@prisma/client'
 import { Auth } from 'src/auth/decorators/auth.decorator'
 import { CurrentUser } from 'src/auth/decorators/user.decorator'
 import { CreateLikeDto } from 'src/comments/dto/create_like.dto'
@@ -79,9 +79,9 @@ export class PostsController {
 	@Get('/:id')
 	async getPostById(
 		@Param('id', ParseIntPipe) id: number,
-		@CurrentUser('role') userRole: Role
+		@CurrentUser() user: User
 	) {
-		return this.postsService.getPostById(id, userRole)
+		return this.postsService.getPostById(id, user)
 	}
 
 	@ApiGetCommentsByPostId()
@@ -117,6 +117,12 @@ export class PostsController {
 	@Get('/:id/like')
 	async getLikesByPostId(@Param('id', ParseIntPipe) id: number) {
 		return this.postsService.getLikesByPostId(id)
+	}
+
+	@HttpCode(200)
+	@Get('/:id/rating')
+	async getRatingByPostId(@Param('id', ParseIntPipe) id: number) {
+		return this.postsService.getRatingByPostId(id)
 	}
 
 	@ApiCreatePost()

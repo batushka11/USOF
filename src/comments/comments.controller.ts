@@ -20,6 +20,7 @@ import { CreateLikeDto } from './dto/create_like.dto'
 import { UpdateCommentDto } from './dto/update_comment.dto'
 
 import { AuthGuard } from '@nestjs/passport'
+import { User } from '@prisma/client'
 import {
 	ApiCreateLikeByCommentId,
 	ApiDeleteCommentById,
@@ -43,6 +44,12 @@ export class CommentsController {
 	@Get('/:id')
 	getCommentById(@Param('id', ParseIntPipe) id: number) {
 		return this.commentsService.getCommentById(id)
+	}
+
+	@HttpCode(200)
+	@Get('/:id/rating')
+	async getRatingByCommentId(@Param('id', ParseIntPipe) id: number) {
+		return this.commentsService.getRatingByCommentId(id)
 	}
 
 	@Auth()
@@ -85,9 +92,9 @@ export class CommentsController {
 	@Delete('/:id')
 	deleteCommentById(
 		@Param('id', ParseIntPipe) commentId: number,
-		@CurrentUser('id') authorId: number
+		@CurrentUser() author: User
 	) {
-		return this.commentsService.deleteCommentById(commentId, authorId)
+		return this.commentsService.deleteCommentById(commentId, author)
 	}
 
 	@Auth()

@@ -4,7 +4,7 @@ import {
 	Injectable,
 	NotFoundException
 } from '@nestjs/common'
-import { Type } from '@prisma/client'
+import { Type, User } from '@prisma/client'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { CreateLikeDto } from './dto/create_like.dto'
 import { UpdateCommentDto } from './dto/update_comment.dto'
@@ -116,21 +116,26 @@ export class CommentsService {
 			}
 		})
 
-		const user = await this.prisma.comment.findUnique({
-			where: { id: commentId },
-			include: {
-				user: true
-			}
-		})
-
 		await this.prisma.user.update({
-			where: { id: user.authorId },
+			where: { id: authorId },
 			data: {
 				rating: {
 					increment: like.type === Type.LIKE ? -1 : 1
 				}
 			}
 		})
+	}
+
+	async getRatingByCommentId(id: number) {
+		const commentWithRating = await this.prisma.comment.findUnique({
+			where: { id }
+		})
+
+		if (!commentWithRating) {
+			throw new NotFoundException('Comment with this id doesn’t exist')
+		}
+
+		return commentWithRating.rating
 	}
 
 	async updateCommentById(
@@ -147,12 +152,13 @@ export class CommentsService {
 		})
 	}
 
-	async deleteCommentById(commentId: number, authorId: number) {
+	async deleteCommentById(commentId: number, author: User) {
 		const comment = await this.findCommentOrFail(commentId)
-		if (comment.authorId !== authorId) throw new ForbiddenException()
+		if (comment.authorId !== author.id && author.role !== 'ADMIN')
+			throw new ForbiddenException()
 
 		await this.prisma.comment.delete({
-			where: { id: commentId, authorId }
+			where: { id: commentId }
 		})
 	}
 }

@@ -22,12 +22,36 @@ export class PostsService {
 		private mailerService: MailerService
 	) {}
 
-	private async findPostOrFail(postId: number) {
-		const post = await this.prisma.post.findUnique({ where: { id: postId } })
+	private async findPostOrFail(postId: number, userId: number) {
+		const post = await this.prisma.post.findUnique({
+			where: { id: postId },
+			include: {
+				PostFavorite: {
+					where: {
+						userId
+					},
+					select: {
+						postId: true
+					}
+				},
+				PostSubscribe: {
+					where: {
+						userId
+					},
+					select: {
+						postId: true
+					}
+				}
+			}
+		})
 		if (!post) {
 			throw new NotFoundException('Post with this id doesn’t exist')
 		}
-		return post
+		return {
+			...post,
+			isBookmarked: post.PostFavorite.length > 0,
+			isSubscribed: post.PostSubscribe.length > 0
+		}
 	}
 
 	async getAllPosts(
@@ -122,9 +146,13 @@ export class PostsService {
 		}
 	}
 
-	async getPostById(id: number, userRole: Role) {
-		const post = await this.findPostOrFail(id)
-		if (post.status === 'INACTIVE' && userRole !== 'ADMIN')
+	async getPostById(id: number, user: User) {
+		const post = await this.findPostOrFail(id, user.id)
+		if (
+			post.status === 'INACTIVE' &&
+			user.role !== 'ADMIN' &&
+			user.id !== post.authorId
+		)
 			throw new ForbiddenException('User not authorized to see this post')
 
 		return post
@@ -140,9 +168,12 @@ export class PostsService {
 		const [comments, totalComments] = await Promise.all([
 			this.prisma.comment.findMany({
 				where: { postId: id },
-				orderBy: { rating: 'desc' },
+				orderBy: { publishAt: 'desc' },
 				take: limit,
-				skip: offset
+				skip: offset,
+				include: {
+					user: true
+				}
 			}),
 			this.prisma.comment.count({ where: { postId: id } })
 		])
@@ -169,8 +200,9 @@ export class PostsService {
 		commentData: { content: string },
 		authorId: number
 	) {
-		const post = await this.findPostOrFail(postId)
-
+		const post = await this.findPostOrFail(postId, authorId)
+		if (post.status === 'INACTIVE')
+			throw new ForbiddenException('You can`t comment inactive post')
 		const newComment = await this.prisma.comment.create({
 			data: { content: commentData.content, postId, authorId }
 		})
@@ -198,7 +230,7 @@ export class PostsService {
 					login: subscriber.user.login,
 					title: post.title,
 					commentContent: commentData.content,
-					url: `http://localhost:4200/api/posts/${postId}`
+					url: `http://localhost:3000/post/${postId}`
 				}
 			})
 		}
@@ -234,6 +266,18 @@ export class PostsService {
 		}
 
 		return postWithLikes.like
+	}
+
+	async getRatingByPostId(id: number) {
+		const postWithRating = await this.prisma.post.findUnique({
+			where: { id }
+		})
+
+		if (!postWithRating) {
+			throw new NotFoundException('Post with this id doesn’t exist')
+		}
+
+		return postWithRating.rating
 	}
 
 	private async handleCategories(categoryTitles: string[]) {
@@ -286,7 +330,7 @@ export class PostsService {
 		authorId: number,
 		interactionType: Type
 	) {
-		await this.findPostOrFail(postId)
+		await this.findPostOrFail(postId, authorId)
 
 		const existingInteraction = await this.prisma.like.findFirst({
 			where: { postId, authorId }
@@ -305,15 +349,8 @@ export class PostsService {
 			}
 		})
 
-		const user = await this.prisma.post.findUnique({
-			where: { id: postId },
-			include: {
-				user: true
-			}
-		})
-
 		await this.prisma.user.update({
-			where: { id: user.authorId },
+			where: { id: authorId },
 			data: {
 				rating: {
 					increment: interactionType === Type.LIKE ? 1 : -1
@@ -338,7 +375,7 @@ export class PostsService {
 	}
 
 	async deleteLikeByPostId(postId: number, authorId: number) {
-		await this.findPostOrFail(postId)
+		await this.findPostOrFail(postId, authorId)
 
 		const like = await this.prisma.like.findFirst({
 			where: {
@@ -381,7 +418,7 @@ export class PostsService {
 	}
 
 	async updatePostById(postId: number, dto: UpdatePostDto, author: User) {
-		const post = await this.findPostOrFail(postId)
+		const post = await this.findPostOrFail(postId, author.id)
 
 		if (post.authorId !== author.id && author.role !== Role.ADMIN) {
 			throw new ForbiddenException('User with this id cannot update this post')
@@ -424,7 +461,7 @@ export class PostsService {
 				context: {
 					name: subscriber.user.login,
 					title: updatedPost.title,
-					url: `http://localhost:4200/api/posts/${postId}`
+					url: `http://localhost:3000/post/${postId}`
 				}
 			})
 		}
@@ -433,7 +470,7 @@ export class PostsService {
 	}
 
 	async deletePostById(postId: number, user: User) {
-		const post = await this.findPostOrFail(postId)
+		const post = await this.findPostOrFail(postId, user.id)
 
 		if (post.authorId !== user.id && user.role !== Role.ADMIN) {
 			throw new ForbiddenException('User with this id cannot delete this post')
@@ -443,7 +480,7 @@ export class PostsService {
 	}
 
 	async addPostToFavorite(postId: number, userId: number) {
-		const post = await this.findPostOrFail(postId)
+		const post = await this.findPostOrFail(postId, userId)
 
 		if (post.status === Status.INACTIVE)
 			throw new BadRequestException('You cannot add inactive post to bookmarks')
@@ -472,7 +509,7 @@ export class PostsService {
 	}
 
 	async deletePostFromFavorite(postId: number, userId: number) {
-		await this.findPostOrFail(postId)
+		await this.findPostOrFail(postId, userId)
 
 		const favorite = await this.prisma.postFavorite.findFirst({
 			where: {
@@ -494,7 +531,7 @@ export class PostsService {
 	}
 
 	async addPostToSubscribe(postId: number, userId: number) {
-		const post = await this.findPostOrFail(postId)
+		const post = await this.findPostOrFail(postId, userId)
 
 		if (post.status === Status.INACTIVE)
 			throw new BadRequestException('You cannot add inactive post to subscribe')
@@ -523,7 +560,7 @@ export class PostsService {
 	}
 
 	async deletePostFromSubscribe(postId: number, userId: number) {
-		await this.findPostOrFail(postId)
+		await this.findPostOrFail(postId, userId)
 
 		const subscribe = await this.prisma.postSubscribe.findFirst({
 			where: {

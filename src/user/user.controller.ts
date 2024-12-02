@@ -32,6 +32,10 @@ import { RolesGuard } from './guards/role.guard'
 import { UserService } from './user.service'
 import { avatarFileInterceptor } from './util/file-upload.util'
 
+import { Filtering } from 'src/filtering/filter.interface'
+import { FilteringParams } from 'src/filtering/filter_params.decorator'
+import { Sorting } from 'src/sorting/sort.interface'
+import { SortingParams } from 'src/sorting/sort_params.decorator'
 import {
 	ApiCreateUser,
 	ApiDeleteUser,
@@ -56,18 +60,34 @@ export class UserController {
 	@Get('/subscribe')
 	async getSubscribePost(
 		@CurrentUser('id') id: number,
-		@PaginationParams() paginationParams: Pagination
+		@PaginationParams() paginationParams: Pagination,
+		@SortingParams() sortingParams: Sorting,
+		@FilteringParams() filteringParams: Filtering
 	) {
-		return this.userService.getSubscribePost(id, paginationParams)
+		return this.userService.getSubscribePost(
+			id,
+			paginationParams,
+			sortingParams,
+			filteringParams
+		)
 	}
 
 	@HttpCode(200)
 	@Get('/:id/posts')
 	async getUserPost(
-		@Param('id', ParseIntPipe) id: number,
-		@PaginationParams() paginationParams: Pagination
+		@CurrentUser() user: User,
+		@Param('id', ParseIntPipe) userId: number,
+		@PaginationParams() paginationParams: Pagination,
+		@SortingParams() sortingParams: Sorting,
+		@FilteringParams() filteringParams: Filtering
 	) {
-		return this.userService.getUserPost(id, paginationParams)
+		return this.userService.getUserPost(
+			userId,
+			paginationParams,
+			sortingParams,
+			filteringParams,
+			user
+		)
 	}
 
 	@ApiGetFavoritePosts()
@@ -75,16 +95,26 @@ export class UserController {
 	@Get('/favorite')
 	async getFavoritePost(
 		@CurrentUser('id') id: number,
-		@PaginationParams() paginationParams: Pagination
+		@PaginationParams() paginationParams: Pagination,
+		@SortingParams() sortingParams: Sorting,
+		@FilteringParams() filteringParams: Filtering
 	) {
-		return this.userService.getFavoritePost(id, paginationParams)
+		return this.userService.getFavoritePost(
+			id,
+			paginationParams,
+			sortingParams,
+			filteringParams
+		)
 	}
 
 	@ApiGetAllUsers()
 	@HttpCode(200)
 	@Get()
-	async getUsers(@PaginationParams() paginationParams: Pagination) {
-		return this.userService.getAllUsers(paginationParams)
+	async getUsers(
+		@PaginationParams() paginationParams: Pagination,
+		@SortingParams() sortingParams: Sorting
+	) {
+		return this.userService.getAllUsers(paginationParams, sortingParams)
 	}
 
 	@ApiGetUserById()

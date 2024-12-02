@@ -47,8 +47,8 @@ export class CategoriesController {
 	@ApiGetAllCategories()
 	@HttpCode(200)
 	@Get()
-	async getAllCategories(@PaginationParams() paginationParams: Pagination) {
-		return this.categoriesService.getAllCategories(paginationParams)
+	async getAllCategories() {
+		return this.categoriesService.getAllCategories()
 	}
 
 	@ApiGetCategoryById()

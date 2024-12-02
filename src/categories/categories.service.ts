@@ -26,30 +26,10 @@ export class CategoriesService {
 			throw new ConflictException('Category with this title already exists')
 	}
 
-	async getAllCategories({ page, limit, offset }: Pagination) {
-		const [posts, totalCount] = await Promise.all([
-			this.prisma.category.findMany({
-				take: limit,
-				skip: offset
-			}),
-			this.prisma.category.count()
-		])
-
-		const totalPages = Math.ceil(totalCount / limit)
-		const hasNextPage = page < totalPages
-		const hasPreviousPage = page > 1
-		const nextPage = hasNextPage ? page + 1 : null
-		const previousPage = hasPreviousPage ? page - 1 : null
-
-		return {
-			posts,
-			totalCount,
-			page,
-			limit,
-			totalPages,
-			nextPage,
-			previousPage
-		}
+	async getAllCategories() {
+		const categories = await this.prisma.category.findMany()
+		if (!categories) throw new NotFoundException('No one categories exists')
+		return categories
 	}
 
 	async getCategoryById(id: number) {
