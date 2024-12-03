@@ -1,8 +1,7 @@
 import {
 	BadRequestException,
 	ForbiddenException,
-	Injectable,
-	NotFoundException
+	Injectable
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { Role, User } from '@prisma/client'
@@ -211,10 +210,6 @@ export class UserService {
 			this.prisma.postFavorite.count({ where: { userId } })
 		])
 
-		if (posts.length < 1) {
-			throw new NotFoundException('You do not have any favorite posts')
-		}
-
 		const totalPages = Math.ceil(totalCount / limit)
 		const hasNextPage = page < totalPages
 		const hasPreviousPage = page > 1
@@ -298,10 +293,6 @@ export class UserService {
 			this.prisma.postSubscribe.count({ where: { userId } })
 		])
 
-		if (posts.length < 1) {
-			throw new NotFoundException('You do not have any subscribed posts')
-		}
-
 		const totalPages = Math.ceil(totalCount / limit)
 		const hasNextPage = page < totalPages
 		const hasPreviousPage = page > 1
@@ -383,10 +374,6 @@ export class UserService {
 			}),
 			this.prisma.post.count({ where: { authorId: userId } })
 		])
-
-		if (posts.length < 1) {
-			throw new NotFoundException('You do not have any posts')
-		}
 
 		const enrichedPosts = posts.map(
 			({ PostFavorite, PostSubscribe, ...post }) => ({

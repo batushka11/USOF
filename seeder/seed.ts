@@ -16,9 +16,12 @@ async function createAdmin(): Promise<User> {
 			email: 'admin@example.com',
 			avatarPath: process.env.AWS_DEFAULT_IMAGE_URL || 'default_avatar.png',
 			role: 'ADMIN',
-			rating: 0,
+			rating: 5000,
 			isConfirm: true,
-			confirmToken: null
+			confirmToken: null,
+			postsCount: 100,
+			commentsCount: 100,
+			reactionsCount: 200
 		}
 	})
 }
@@ -34,9 +37,12 @@ async function createUsers(): Promise<User[]> {
 					email: faker.internet.email(),
 					avatarPath: process.env.AWS_DEFAULT_IMAGE_URL || 'default_avatar.png',
 					role: 'USER',
-					rating: 0,
+					rating: faker.number.int({ min: 500, max: 5000 }),
 					isConfirm: true,
-					confirmToken: null
+					confirmToken: null,
+					postsCount: faker.number.int({ min: 50, max: 100 }),
+					commentsCount: faker.number.int({ min: 50, max: 100 }),
+					reactionsCount: faker.number.int({ min: 100, max: 200 })
 				}
 			})
 		)
@@ -61,15 +67,16 @@ async function createPosts(
 	categories: Category[]
 ): Promise<Post[]> {
 	return Promise.all(
-		Array.from({ length: 83 }).map(async () => {
+		Array.from({ length: 200 }).map(async () => {
 			const author = users[Math.floor(Math.random() * users.length)]
 			const post = await prisma.post.create({
 				data: {
 					publishAt: faker.date.past(),
 					status: faker.helpers.arrayElement(['ACTIVE', 'INACTIVE']),
-					title: faker.lorem.words(2),
+					title: faker.lorem.words(5),
 					content: faker.lorem.paragraphs(5),
-					authorId: author.id
+					authorId: author.id,
+					rating: faker.number.int({ min: 50, max: 200 })
 				}
 			})
 
@@ -106,7 +113,7 @@ async function createComments(
 ): Promise<Comment[]> {
 	return Promise.all(
 		posts.flatMap(post =>
-			Array.from({ length: faker.number.int({ min: 1, max: 5 }) }).map(
+			Array.from({ length: faker.number.int({ min: 5, max: 15 }) }).map(
 				async () => {
 					const author = users[Math.floor(Math.random() * users.length)]
 					const comment = await prisma.comment.create({
@@ -114,7 +121,8 @@ async function createComments(
 							content: faker.lorem.sentence().slice(0, 255),
 							publishAt: faker.date.recent(),
 							authorId: author.id,
-							postId: post.id
+							postId: post.id,
+							rating: faker.number.int({ min: 10, max: 50 })
 						}
 					})
 
@@ -135,7 +143,7 @@ async function createComments(
 async function createPostLikes(users: User[], posts: Post[]) {
 	for (const post of posts) {
 		for (const _ of Array.from({
-			length: faker.number.int({ min: 1, max: 10 })
+			length: faker.number.int({ min: 5, max: 20 })
 		})) {
 			const user = users[Math.floor(Math.random() * users.length)]
 			const existingLike = await prisma.like.findUnique({
@@ -175,7 +183,7 @@ async function createPostLikes(users: User[], posts: Post[]) {
 async function createCommentLikes(users: User[], comments: Comment[]) {
 	for (const comment of comments) {
 		for (const _ of Array.from({
-			length: faker.number.int({ min: 1, max: 5 })
+			length: faker.number.int({ min: 5, max: 15 })
 		})) {
 			const user = users[Math.floor(Math.random() * users.length)]
 			const existingLike = await prisma.like.findUnique({
@@ -214,31 +222,6 @@ async function createCommentLikes(users: User[], comments: Comment[]) {
 	}
 }
 
-async function updateUserRatings(users: User[]) {
-	for (const user of users) {
-		const postLikes = await prisma.like.count({
-			where: { post: { authorId: user.id }, type: 'LIKE' }
-		})
-		const postDislikes = await prisma.like.count({
-			where: { post: { authorId: user.id }, type: 'DISLIKE' }
-		})
-
-		const commentLikes = await prisma.like.count({
-			where: { comment: { authorId: user.id }, type: 'LIKE' }
-		})
-		const commentDislikes = await prisma.like.count({
-			where: { comment: { authorId: user.id }, type: 'DISLIKE' }
-		})
-
-		const rating = postLikes - postDislikes + (commentLikes - commentDislikes)
-
-		await prisma.user.update({
-			where: { id: user.id },
-			data: { rating }
-		})
-	}
-}
-
 async function main() {
 	await createAdmin()
 	const users = await createUsers()
@@ -247,9 +230,8 @@ async function main() {
 	const comments = await createComments(users, posts)
 	await createPostLikes(users, posts)
 	await createCommentLikes(users, comments)
-	await updateUserRatings(users)
 	console.log(
-		'Seed data created: 20 users, 83 posts with random statuses, categories, comments, and likes.'
+		'Seed data created with high-rating users and abundant posts/comments.'
 	)
 }
 
