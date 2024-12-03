@@ -116,8 +116,15 @@ export class CommentsService {
 			}
 		})
 
+		const user = await this.prisma.comment.findUnique({
+			where: { id: commentId },
+			include: {
+				user: true
+			}
+		})
+
 		await this.prisma.user.update({
-			where: { id: authorId },
+			where: { id: user.id },
 			data: {
 				rating: {
 					increment: like.type === Type.LIKE ? -1 : 1

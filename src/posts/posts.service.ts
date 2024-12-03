@@ -349,8 +349,15 @@ export class PostsService {
 			}
 		})
 
+		const user = await this.prisma.post.findUnique({
+			where: { id: postId },
+			include: {
+				user: true
+			}
+		})
+
 		await this.prisma.user.update({
-			where: { id: authorId },
+			where: { id: user.id },
 			data: {
 				rating: {
 					increment: interactionType === Type.LIKE ? 1 : -1
