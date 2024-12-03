@@ -207,7 +207,7 @@ export class UserService {
 					}
 				}
 			}),
-			this.prisma.postFavorite.count({ where: { userId } })
+			this.prisma.postFavorite.count({ where: { userId, post: where } })
 		])
 
 		const totalPages = Math.ceil(totalCount / limit)
@@ -290,7 +290,7 @@ export class UserService {
 					}
 				}
 			}),
-			this.prisma.postSubscribe.count({ where: { userId } })
+			this.prisma.postSubscribe.count({ where: { userId, post: where } })
 		])
 
 		const totalPages = Math.ceil(totalCount / limit)
@@ -372,7 +372,7 @@ export class UserService {
 					}
 				}
 			}),
-			this.prisma.post.count({ where: { authorId: userId } })
+			this.prisma.post.count({ where })
 		])
 
 		const enrichedPosts = posts.map(
