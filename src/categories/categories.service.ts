@@ -69,10 +69,6 @@ export class CategoriesService {
 			})
 		])
 
-		if (posts.length === 0) {
-			throw new NotFoundException('No posts associated with this category')
-		}
-
 		const totalPages = Math.ceil(totalCount / limit)
 		const hasNextPage = page < totalPages
 		const hasPreviousPage = page > 1
