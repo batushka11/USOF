@@ -325,7 +325,8 @@ export class UserService {
 
 		where.authorId = userId
 
-		where.status = user.role === Role.ADMIN ? status : 'ACTIVE'
+		where.status =
+			user.role === Role.ADMIN || user.id === userId ? undefined : 'ACTIVE'
 
 		if (category && category.length > 0) {
 			where.categories = {
