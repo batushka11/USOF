@@ -369,7 +369,7 @@ export class UserService {
 				where,
 				take: limit,
 				skip: offset,
-				orderBy: { [sortBy]: 'desc' },
+				orderBy: { [sortBy]: order },
 				include: {
 					PostFavorite: {
 						where: { userId },
