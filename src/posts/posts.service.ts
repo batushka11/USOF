@@ -357,7 +357,7 @@ export class PostsService {
 		})
 
 		await this.prisma.user.update({
-			where: { id: user.id },
+			where: { id: user.authorId },
 			data: {
 				rating: {
 					increment: interactionType === Type.LIKE ? 1 : -1

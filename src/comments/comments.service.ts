@@ -124,7 +124,7 @@ export class CommentsService {
 		})
 
 		await this.prisma.user.update({
-			where: { id: user.id },
+			where: { id: user.authorId },
 			data: {
 				rating: {
 					increment: like.type === Type.LIKE ? -1 : 1
